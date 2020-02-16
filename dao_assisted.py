@@ -11,20 +11,7 @@ from database import Data
 
 db = Data()
 
-class DataAcess:
-    def create_table_user(self):
-        try:
-            table_sql = 'CREATE TABLE IF NOT EXISTS tb_usuarios (id_usuario INTEGER NOT NULL PRIMARY KEY, Nome TEXT, Usuario TEXT, Senha TEXT, Categoria TEXT, Status TEXT)'
-            
-            conn = db.create_connection()
-            cursor = conn.cursor()
-            cursor.execute(table_sql)
-        except sql.Error as e:
-            print(e)
-        finally:
-            db.close_connection(conn, cursor)
-
-
+class DataAcessAssisted:
     def create_table_assisted(self):
         try:
             table_sql = 'CREATE TABLE IF NOT EXISTS tb_assistidos (id_assistido INTEGER NOT NULL PRIMARY KEY, Nome TEXT, Data_de_nascimento TEXT, Telefone_1 TEXT, Telefone_2 TEXT, Genero TEXT, Estado_civil TEXT, Ocupacao TEXT, Reside_com TEXT, Endereco TEXT, Bairro TEXT, Numero TEXT, Cidade TEXT, Estado TEXT, Toma_sedativos TEXT, Tratamento_medico TEXT, Dorme_bem TEXT, Vicios TEXT, Sonhos TEXT, Trabalho TEXT, Familia TEXT, Alimentacao TEXT, Info_para_DEPOE TEXT, Cursos TEXT, Encaminhamento TEXT, Tratamentos TEXT, Orientacao_espiritual TEXT)'
@@ -61,19 +48,7 @@ class DataAcess:
         except sql.Error as e:
             print(e)
         finally:
-            db.close_connection(conn, cursor)
-
-
-    def id_gen_user(self):
-        try:
-            conn = db.create_connection()
-            cursor = conn.cursor()
-            rs = cursor.execute('SELECT COUNT(*) FROM tb_usuarios').fetchone()[0] + 1
-            return rs
-        except sql.Error as e:
-            print(e)
-        finally:
-            db.close_connection(conn, cursor)        
+            db.close_connection(conn, cursor)   
 
     def id_gen_assisted(self):
         try:
@@ -97,7 +72,7 @@ class DataAcess:
                         
             root = tkinter.Tk()
             root.withdraw()
-            messagebox.showinfo('CADASTRADO', 'Assistido cadastrado com sucesso!')        
+            messagebox.showinfo('CADASTRADO', 'Assistido CADASTRADO com sucesso!')        
             tkinter.Tk().destroy()
         except sql.Error as e:
             print(e)
@@ -109,7 +84,7 @@ class DataAcess:
             conn = db.create_connection()
             cursor = conn.cursor()
             rs = cursor.execute('SELECT * FROM tb_assistidos WHERE id_assistido = {}'.format(i)).fetchone()
-                                    
+                                                            
             a.code = rs[0]
             a.name = rs[1]
             a.date_of_birth = rs[2]
@@ -141,119 +116,59 @@ class DataAcess:
             print(e)
         finally:
             db.close_connection(conn, cursor)
-
-
-
-
-
-
-
-    def register_count_user(self, u):
+   
+   
+    def delete_assisted(self, i):
         try:
-            conn = db.create_connection()
-            cursor = conn.cursor()
-            rs = cursor.execute("SELECT COUNT(*) FROM tb_usuarios WHERE Usuario = '{}'".format(u.user)).fetchone()[0]
-            return rs
-        except sql.Error as e:
-            print(e)
-        finally:
-            db.close_connection(conn, cursor)
-
-
-    def check_password(self, u):
-        try:
-            conn = db.create_connection()
-            cursor = conn.cursor()
-            rs = cursor.execute("SELECT Senha FROM tb_usuarios WHERE Usuario = '{}'".format(u.user)).fetchone()[0]
-            return rs
-        except sql.Error as e:
-            print(e)
-        finally:
-            db.close_connection(conn, cursor)
-
-
-    def insert_user(self, u):
-        try:
-            sql_string = "INSERT INTO tb_usuarios VALUES ({}, '{}', '{}', '{}', '{}', 'OFF')".format(u.code, u.name, u.user, u.password, u.category)
-
+            temp_id = i
+            sql_string = 'DELETE FROM tb_assistidos WHERE id_assistido = ' + str(temp_id)
+            
             conn = db.create_connection()
             cursor = conn.cursor()
             cursor.execute(sql_string)
             conn.commit()
-                        
+            
+            sql_string = 'UPDATE tb_assistidos SET id_assistido = id_assistido - 1 WHERE id_assistido > ' + str(temp_id)
+            cursor.execute(sql_string)
+            conn.commit()
+            
             root = tkinter.Tk()
             root.withdraw()
-            messagebox.showinfo('CADASTRADO', 'Usuário cadastrado com sucesso!')        
+            messagebox.showinfo('DELETADO', 'Registro DELETADO com sucesso!')        
             tkinter.Tk().destroy()
-        except sql.Error as e:
-            print(e)
-        finally:
-            db.close_connection(conn, cursor)    
             
-    def set_off(self):
-        try:
-            sql_string = "UPDATE tb_usuarios SET Status = 'OFF' WHERE Status = 'ON'"
-
-            conn = db.create_connection()
-            cursor = conn.cursor()
-            cursor.execute(sql_string)
-            conn.commit()
+            if self.id_gen_assisted() - 1 == 0:
+                return 'zero'            
+            else:
+                if temp_id > self.id_gen_assisted() - 1:
+                    return 'higher'
+                elif temp_id < self.id_gen_assisted() - 1:
+                    return 'lower'
+                else:
+                    return 'equal'
         except sql.Error as e:
             print(e)
         finally:
-            db.close_connection(conn, cursor) 
-
-    def set_on(self, u):
-        try:
-            sql_string = "UPDATE tb_usuarios SET Status = 'ON' WHERE Usuario = '{}'".format(u.user)
-
-            conn = db.create_connection()
-            cursor = conn.cursor()
-            cursor.execute(sql_string)
-            conn.commit()
-        except sql.Error as e:
-            print(e)
-        finally:
-            db.close_connection(conn, cursor) 
-
-
-    def select(self, p, i):
-        try:
-            conn = db.create_connection()
-            cursor = conn.cursor()
-            rs = cursor.execute('SELECT * FROM tb_pedidos WHERE ID = {}'.format(i)).fetchone()
-                                    
-            p.set_codigo(rs[0])
-            p.set_data_cadastro(rs[1])
-            p.set_assistido(rs[2])
-            p.set_necessidade(rs[3])
-            p.set_idade(rs[4])
-            p.set_inicio(rs[5])
-            p.set_fim(rs[6])
-            p.set_solicitante(rs[7])
-            p.set_email(rs[8])
-            p.set_telefone(rs[9])
-            p.set_endereco(rs[10])
-            p.set_observacao(rs[11])
-            p.set_acidentes(rs[12])
-            p.set_psiquiatrico(rs[13])
-            p.set_dependencias(rs[14])
-            p.set_desemprego(rs[15])
-            p.set_hospital(rs[16])
-            p.set_cirurgia(rs[17])
-            p.set_falecimento(rs[18])
-            p.set_preso(rs[19])
-            p.set_obsessivo(rs[20])
-            p.set_desaparecimento(rs[21])
-            p.set_sequestro(rs[22])
-            p.set_suicidio(rs[23])
-            p.set_depressao(rs[24])
-            p.set_outro(rs[25])        
-        except sql.Error as e:
-            print(e)
-        finally:
-            db.close_connection(conn, cursor)
-            
+            db.close_connection(conn, cursor)   
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   
             
     def gen_csv(self):
         try:

@@ -4,17 +4,19 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 from dto_user import User
 from dto_assisted import Assisted
 from tkinter import messagebox
-from dao import DataAcess
+from dao_assisted import DataAcessAssisted
 
-dao = DataAcess()
-u = User()
+# GLOBAL OBJECTS
+dao = DataAcessAssisted()
 a = Assisted()
 
 class Ui_FormFicha(object):
+    # FORM VARIABLES
     index = 0
     error_message = ''
-  
-    def empty_form(self):        
+    
+    # PASSIVE METHODS
+    def empty_form(self):
         self.txt_name.setText('')
         self.txt_date.setText('')
         self.txt_phone1.setText('')
@@ -901,7 +903,8 @@ class Ui_FormFicha(object):
             if text.startswith(places[i]):                
                 return text.replace(places[i], shortened[i], 1)            
             i += 1
-        
+
+    # BUTTONS METHODS    
     def btn_first_clicked(self):
         self.index = 1
         dao.select_assisted(a, self.index)
@@ -984,13 +987,45 @@ class Ui_FormFicha(object):
         if not self.test_mandatory_fields():
             root = tkinter.Tk()
             root.withdraw()
-            choice = messagebox.showerror('ERRO', 'Não foi possível concluir o salvamento devido os seguintes erros:\n\n' + self.error_message)
+            messagebox.showerror('ERRO', 'Não foi possível concluir o salvamento devido os seguintes erros:\n\n' + self.error_message)
             tkinter.Tk().destroy()
         else:
-            self.get_values(a)
-            dao.insert_assisted(a)
-            self.btn_last_clicked()
-            self.btn_cancel_clicked()
+            root = tkinter.Tk()
+            root.withdraw()
+            choice = messagebox.askquestion('SALVAR MODIFICAÇÕES', 'Deseja salvar as alterações feitas?')
+            tkinter.Tk().destroy()
+            
+            if choice == 'yes':
+                self.get_values(a)
+                dao.insert_assisted(a)
+                self.btn_last_clicked()
+                self.btn_cancel_clicked()
+                
+    def btn_delete_clicked(self):
+        root = tkinter.Tk()
+        root.withdraw()
+        choice = messagebox.askquestion('DELETAR REGISTRO', 'Deseja DELETAR o registro de <{}>?'.format(a.name))
+        tkinter.Tk().destroy()
+        
+        if choice == 'yes':
+            if dao.delete_assisted(self.index) == 'zero':
+                self.index = 0
+                self.empty_form()            
+            elif dao.delete_assisted(self.index) == 'higher':
+                self.index -= 1
+                self.fill_form()
+                self.action_buttons()
+                self.navigation_buttons()
+            elif dao.delete_assisted(self.index) == 'lower':
+                self.index += 1
+                self.fill_form()
+                self.action_buttons()
+                self.navigation_buttons()
+            else:
+                self.index = self.index
+                self.fill_form()
+                self.action_buttons()
+                self.navigation_buttons()
 
     def radio_addictions_no_toggled(self):
         if self.check_alcohol.isChecked():
@@ -1027,7 +1062,7 @@ class Ui_FormFicha(object):
         self.check_sex.setEnabled(True)
 
 
-
+    # QT METHODS
     def setupUi(self, FormFicha):
         FormFicha.setObjectName("FormFicha")
         FormFicha.resize(900, 650)
@@ -2230,6 +2265,7 @@ class Ui_FormFicha(object):
         icon12.addPixmap(QtGui.QPixmap("images/bin_empty.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
         self.btn_delete.setIcon(icon12)
         self.btn_delete.setObjectName("btn_delete")
+        self.btn_delete.clicked.connect(self.btn_delete_clicked)
         self.btn_edit = QtWidgets.QPushButton(self.groupBox)
         self.btn_edit.setGeometry(QtCore.QRect(10, 80, 121, 34))
         font = QtGui.QFont()

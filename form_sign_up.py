@@ -3,10 +3,10 @@ import tkinter
 from PyQt5 import QtCore, QtGui, QtWidgets
 from dto_user import User
 from tkinter import messagebox
-from dao import DataAcess
+from dao_user import DataAcessUser
 
 u = User()
-dao = DataAcess()
+dao = DataAcessUser()
 
 class Ui_FormSignUp(object):
     password_visible = False

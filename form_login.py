@@ -3,9 +3,13 @@ import tkinter
 from PyQt5 import QtCore, QtGui, QtWidgets
 from dto_user import User
 from tkinter import messagebox
-from dao import DataAcess
+from dao_user import DataAcessUser
+from dao_assisted import DataAcessAssisted
+from dao_interview import DataAcessInterview
 
-dao = DataAcess()
+dao_user = DataAcessUser()
+dao_assited = DataAcessAssisted()
+dao_interview = DataAcessInterview()
 u = User()
 
 class Ui_FormLogin(object):
@@ -27,7 +31,7 @@ class Ui_FormLogin(object):
 
     def btn_signin_clicked(self):
         u.user = self.txt_user.text().strip()
-        if dao.register_count_user(u) < 1:
+        if dao_user.register_count_user(u) < 1:
             root = tkinter.Tk()
             root.withdraw()
             messagebox.showerror('ERRO', 'O Usuário não existe no banco de dados.')
@@ -40,13 +44,13 @@ class Ui_FormLogin(object):
                 messagebox.showerror('ERRO', 'A senha não pode estar vazia.')
                 tkinter.Tk().destroy()
             else:    
-                if dao.check_password(u) != u.password:
+                if dao_user.check_password(u) != u.password:
                     root = tkinter.Tk()
                     root.withdraw()
                     messagebox.showerror('ERRO', 'Senha incorreta para o usuário <{}>'.format(u.user))
                     tkinter.Tk().destroy()
                 else:
-                    dao.set_on(u)
+                    dao_user.set_on(u)
                     from form_assisted import Ui_FormFicha
                     root = tkinter.Tk()
                     root.withdraw()
@@ -175,11 +179,11 @@ class Ui_FormLogin(object):
 
 if __name__ == "__main__":
     import sys
-    dao.create_table_user()
-    dao.create_table_person()
-    dao.create_table_interview()
-    dao.create_table_person_interview()
-    dao.set_off()
+    dao_user.create_table_user()
+    dao_assited.create_table_assisted()
+    dao_interview.create_table_interview()
+    dao_interview.create_table_assisted_interview()
+    dao_user.set_off()
     app = QtWidgets.QApplication(sys.argv)
     FormLogin = QtWidgets.QMainWindow()
     ui = Ui_FormLogin()

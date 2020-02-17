@@ -25,31 +25,6 @@ class DataAcessAssisted:
             db.close_connection(conn, cursor)
 
 
-    def create_table_interview(self):
-        try:
-            table_sql = 'CREATE TABLE IF NOT EXISTS tb_entrevistas (id_entrevista INTEGER NOT NULL PRIMARY KEY, Entrevistador TEXT, Tratamento TEXT, Entrevista TEXT)'
-            
-            conn = db.create_connection()
-            cursor = conn.cursor()
-            cursor.execute(table_sql)
-        except sql.Error as e:
-            print(e)
-        finally:
-            db.close_connection(conn, cursor)
-
-
-    def create_table_assisted_interview(self):
-        try:
-            table_sql = 'CREATE TABLE IF NOT EXISTS tb_entrevistados (id_entrevistado INTEGER NOT NULL PRIMARY KEY, id_entrevista INTEGER, id_assistido INTEGER, FOREIGN KEY (id_entrevista) REFERENCES tb_entrevista (id_entrevista), FOREIGN KEY (id_assistido) REFERENCES tb_assistido (id_assistidos))'
-            
-            conn = db.create_connection()
-            cursor = conn.cursor()
-            cursor.execute(table_sql)
-        except sql.Error as e:
-            print(e)
-        finally:
-            db.close_connection(conn, cursor)   
-
     def id_gen_assisted(self):
         try:
             conn = db.create_connection()
@@ -60,6 +35,7 @@ class DataAcessAssisted:
             print(e)
         finally:
             db.close_connection(conn, cursor)                
+
 
     def insert_assisted(self, a):
         try:
@@ -78,6 +54,29 @@ class DataAcessAssisted:
             print(e)
         finally:
             db.close_connection(conn, cursor)    
+
+
+    def edit_assisted(self, a):
+        try:
+            sql_string = "INSERT INTO tb_assistidos VALUES ({}, '{}', '{}', '{}', '{}', '{}', '{}', '{}', '{}', '{}', '{}', '{}', '{}', '{}', '{}', '{}', '{}', '{}', '{}', '{}', '{}', '{}', '{}', '{}', '{}', '{}', '{}')".format(a.code - 1, a.name, a.date_of_birth, a.phone1, a.phone2, a.gender, a.civil_state, a.ocupation, a.lives_with, a.address, a.neighbourhood, a.number, a.city, a.state, a.sedatives, a.medical_treatment, a.sleep_well, a.addictions, a.dreams, a.work, a.family, a.feeding, a.traits, a.courses, a.fowarding, a.treatment, a.guidance)
+
+            conn = db.create_connection()
+            cursor = conn.cursor()
+            cursor.execute('DELETE FROM tb_assistidos WHERE id_assistido = {}'.format(a.code - 1))
+            conn.commit()
+
+            cursor.execute(sql_string)
+            conn.commit()
+                        
+            root = tkinter.Tk()
+            root.withdraw()
+            messagebox.showinfo('CADASTRADO', 'Registro EDITADO com sucesso!')        
+            tkinter.Tk().destroy()
+        except sql.Error as e:
+            print(e)
+        finally:
+            db.close_connection(conn, cursor)    
+
 
     def select_assisted(self, a, i):
         try:
@@ -135,41 +134,83 @@ class DataAcessAssisted:
             root = tkinter.Tk()
             root.withdraw()
             messagebox.showinfo('DELETADO', 'Registro DELETADO com sucesso!')        
-            tkinter.Tk().destroy()
-            
-            if self.id_gen_assisted() - 1 == 0:
-                return 'zero'            
-            else:
-                if temp_id > self.id_gen_assisted() - 1:
-                    return 'higher'
-                elif temp_id < self.id_gen_assisted() - 1:
-                    return 'lower'
-                else:
-                    return 'equal'
+            tkinter.Tk().destroy()        
         except sql.Error as e:
             print(e)
         finally:
             db.close_connection(conn, cursor)   
    
    
-   
-   
-   
-   
-   
-   
-   
-   
-   
-   
-   
-   
-   
-   
-   
-   
-   
+ 
+    def print_register(self, a):
+        try:
+            conn = db.create_connection()
             
+            sql_string = "SELECT * FROM tb_assistidos WHERE id_assistido = {}".format(a.code)
+            
+            query = list(conn.execute(sql_string).fetchone())
+            
+            results = []
+            
+            for item in query:
+                results.append(str(item))
+                    
+            fields = ['ID', 'Nome do Assistido', 'Data de Nascimento', 'Telefone (Celular)', 'Telefone (Residencial)', 'Gênero', 'Estado Civil', 'Ocupação', 'Reside Com', 'Endereço', 'Bairro', 'Número', 'Cidade', 'Estado', 'Toma sedativos', 'Tratamento médico', 'Dorme bem', 'Vícios', 'Sonhos', 'Trabalho', 'Família', 'Alimentação', 'Info para DEPOE', 'Frequência - Cursos', 'Encaminhamento', 'Tratamentos', 'Orientação']
+            
+            pdf = fpdf.FPDF(format='A4')
+            pdf.add_page()
+            pdf.set_font('times', 'B',size = 20)
+            pdf.set_fill_color(200,200,200)
+            pdf.write(15,'FICHA DO ASSISTIDO - {}'.format(results[1]))
+            pdf.ln()  
+            
+            i = 1
+            while i < len(fields):
+                if results[i] != 'Não' and results[i] != '':
+                    pdf.set_font('helvetica', 'B',size = 11)
+                    pdf.cell(55, 10, fields[i].upper(), 1, 0, '', 1, '')
+                    pdf.set_font('helvetica', size = 11)
+                    pdf.multi_cell(0, 10, results[i].replace(' --- ', ', '), 1, 'J', 0)
+                i += 1
+                
+            if platform.system() == 'Linux':
+                path = os.path.expanduser("~") + '/Documentos/GERENCIAMENTO_DE_ASSISTIDOS_AELMAC/FICHAS_INDIVIDUAIS/'
+                if not os.path.exists(path):
+                    os.mkdir(path)
+                    
+                pdf.output(os.path.expanduser("~") + '/Documentos/GERENCIAMENTO_DE_ASSISTIDOS_AELMAC/FICHAS_INDIVIDUAIS/Ficha_de_assistido-' + results[1] + '.pdf')
+            else:
+                if os.path.isdir(os.path.expanduser("~") + '/Documents/GERENCIAMENTO_DE_ASSISTIDOS_AELMAC/FICHAS_INDIVIDUAIS/'.replace('/','\\')) is False:
+                    os.mkdir(os.path.expanduser("~") + '/Documents/GERENCIAMENTO_DE_ASSISTIDOS_AELMAC/FICHAS_INDIVIDUAIS/'.replace('/','\\'))
+                    
+                pdf.output(os.path.expanduser("~") + '/Documents/GERENCIAMENTO_DE_ASSISTIDOS_AELMAC/FICHAS_INDIVIDUAIS/Ficha_de_assistido-' + results[1] + '.pdf'.replace('/','\\'))
+
+
+            root = tkinter.Tk()
+            root.withdraw()
+            messagebox.showinfo('GERAR FICHA', 'Ficha para impressão gerada com sucesso para a pasta <FICHAS_INDIVIDUAIS>!')
+            tkinter.Tk().destroy()
+        except sql.Error as e:
+            print(e)
+        finally:
+            db.close_connection(conn)
+               
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   
+               
     def gen_csv(self):
         try:
             data = datetime.datetime.now().strftime("%d-%m-%y")
@@ -198,53 +239,4 @@ class DataAcessAssisted:
         except sql.Error as e:
             print(e)
         
-    
-    def gen_pdf(self, p):
-        try:
-            conn = db.create_connection()
-            
-            sql_string = "SELECT * FROM tb_pedidos WHERE ID = {}".format(p.get_codigo())
-            
-            lista_query = list(conn.execute(sql_string).fetchone())
-            
-            resultados = []
-            for item in lista_query:
-                resultados.append(str(item))
-                    
-            campos = ['ID', 'Data de Cadastro', 'Assistido', 'Info para DEPOE', 'Idade', 'Data de Início', 'Data de Término', 'Solicitante', 'E-mail', 'Telefone', 'Endereço', 'Observações', 'Acidentes', 'Caso Psiquiátrico', 'Dependências', 'Desemprego', 'Hospitalização', 'Cirurgia', 'Falecimento', 'Preso', 'Obsessivo', 'Desaparecimento', 'Sequestro', 'Tentativa de Suicídio', 'Depressão', 'Outro']
-            
-            pdf = fpdf.FPDF(format='A4')
-            pdf.add_page()
-            pdf.set_font('times', 'B',size = 20)
-            pdf.set_fill_color(200,200,200)
-            pdf.write(15,'PEDIDO DE ORAÇÃO - Nº{} Reg. em {}'.format(resultados[0], resultados[1]))      
-            pdf.ln()  
-            
-            i = 2
-            while i < len(campos):
-                if resultados[i] != 'Não' and resultados[i] != '' and resultados[i] != '()':
-                    pdf.set_font('helvetica', 'B',size = 12)                    
-                    pdf.cell(55, 12, campos[i].upper(), 1, 0, '', 1, '')
-                    pdf.set_font('helvetica', size = 12)
-                    pdf.multi_cell(0, 12, resultados[i], 1, 'J', 0)
-                    #pdf.ln()
-                i += 1
-            if platform.system() == 'Linux':    
-                if not os.path.exists(os.path.expanduser("~") + '/Documentos/Pedidos_AELMAC/PDF'):
-                    os.mkdir(os.path.expanduser("~") + '/Documentos/Pedidos_AELMAC/PDF')
-                pdf.output(os.path.expanduser("~") + '/Documentos/Pedidos_AELMAC/PDF/Pedido_' + resultados[0] + '.pdf')
-            else:
-                if os.path.exists(os.path.expanduser("~") + '\\Documents\\Pedidos_AELMAC\\PDF') is False:
-                    os.mkdir(os.path.expanduser("~") + '\\Documents\\Pedidos_AELMAC\\PDF')
-                pdf.output(os.path.expanduser("~") + '\\Documents\\Pedidos_AELMAC\\PDF\\Pedido_' + resultados[0] + '.pdf')
-
-
-            root = tkinter.Tk()
-            root.withdraw()
-            messagebox.showinfo('SUCESSO', 'PDF do Pedido gerado com sucesso!')
-            tkinter.Tk().destroy()
-        except sql.Error as e:
-            print(e)
-        finally:
-            db.close_connection(conn)
-            
+   

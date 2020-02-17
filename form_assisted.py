@@ -14,6 +14,8 @@ class Ui_FormFicha(object):
     # FORM VARIABLES
     index = 0
     error_message = ''
+    adding = False
+    editing = False
     
     # PASSIVE METHODS
     def empty_form(self):
@@ -898,11 +900,13 @@ class Ui_FormFicha(object):
         shortened = ['AL.', 'AV.', 'BC.', 'BL.', 'BSQ.', 'COND.', 'COHAB.', 'FAV.', 'FAZ.', 'JD.', 'LG.', 'LGA.', 'LRG.', 'MRO.', 'PRQ.','REC.', 'R.', 'TV.', 'VLA.', 'VL.']
 
         i = 0
-        
+        txt = text
         while i < len(shortened):
             if text.startswith(places[i]):                
-                return text.replace(places[i], shortened[i], 1)            
+                txt = text.replace(places[i], shortened[i], 1)                
             i += 1
+        return txt
+    
 
     # BUTTONS METHODS    
     def btn_first_clicked(self):
@@ -962,6 +966,9 @@ class Ui_FormFicha(object):
         self.disable_read_only()
         self.empty_form()        
         self.disable_navigation()
+        
+        self.adding = True
+        
         self.txt_name.setFocus()
         self.btn_add.setEnabled(False)
         self.btn_backups.setEnabled(False)
@@ -977,6 +984,9 @@ class Ui_FormFicha(object):
         self.enable_read_only()
         self.navigation_buttons()
         self.action_buttons()
+        
+        self.adding = False
+        self.editing = False
         
         if dao.id_gen_assisted() - 1 <= 0:
             self.empty_form()
@@ -996,11 +1006,19 @@ class Ui_FormFicha(object):
             tkinter.Tk().destroy()
             
             if choice == 'yes':
-                self.get_values(a)
-                dao.insert_assisted(a)
-                self.btn_last_clicked()
-                self.btn_cancel_clicked()
-                
+                if self.adding:
+                    self.get_values(a)
+                    dao.insert_assisted(a)
+                    self.btn_last_clicked()
+                    self.btn_cancel_clicked()
+                    self.adding = False      
+                elif self.editing:
+                    self.get_values(a)
+                    dao.edit_assisted(a)
+                    self.btn_last_clicked()
+                    self.btn_cancel_clicked()
+                    self.editing = False
+                                    
     def btn_delete_clicked(self):
         root = tkinter.Tk()
         root.withdraw()
@@ -1008,24 +1026,45 @@ class Ui_FormFicha(object):
         tkinter.Tk().destroy()
         
         if choice == 'yes':
-            if dao.delete_assisted(self.index) == 'zero':
-                self.index = 0
-                self.empty_form()            
-            elif dao.delete_assisted(self.index) == 'higher':
-                self.index -= 1
-                self.fill_form()
+            dao.delete_assisted(self.index)
+            if dao.id_gen_assisted() - 1 == 0:
+                self.empty_form()
                 self.action_buttons()
                 self.navigation_buttons()
-            elif dao.delete_assisted(self.index) == 'lower':
-                self.index += 1
-                self.fill_form()
-                self.action_buttons()
-                self.navigation_buttons()
+                
+                self.lbl_index.setText('0')    
+                self.lbl_total_index.setText('0')    
             else:
-                self.index = self.index
+                if self.index > dao.id_gen_assisted() - 1:
+                    self.index -= 1
+                elif self.index < dao.id_gen_assisted() - 1:
+                    self.index += 1                    
+                else:
+                    self.index = self.index
+                    
                 self.fill_form()
                 self.action_buttons()
                 self.navigation_buttons()
+                                                  
+    def btn_edit_clicked(self):
+        self.disable_navigation()
+        self.disable_read_only()
+        
+        self.editing = True
+        
+        self.txt_name.setFocus()
+        self.btn_add.setEnabled(False)
+        self.btn_backups.setEnabled(False)
+        self.btn_log_out.setEnabled(False)
+        self.btn_cancel.setEnabled(True)
+        self.btn_print.setEnabled(False)
+        self.btn_save.setEnabled(True)
+        self.btn_edit.setEnabled(False)
+        self.btn_report.setEnabled(False)
+        self.btn_delete.setEnabled(False)
+        
+    def btn_print_clicked(self):
+        dao.print_register(a)                   
 
     def radio_addictions_no_toggled(self):
         if self.check_alcohol.isChecked():
@@ -2278,6 +2317,7 @@ class Ui_FormFicha(object):
         self.btn_edit.setFont(font)
         self.btn_edit.setIcon(icon18)
         self.btn_edit.setObjectName("btn_edit")
+        self.btn_edit.clicked.connect(self.btn_edit_clicked)
         self.btn_print = QtWidgets.QPushButton(self.groupBox)
         self.btn_print.setGeometry(QtCore.QRect(260, 80, 121, 34))
         font = QtGui.QFont()
@@ -2290,6 +2330,7 @@ class Ui_FormFicha(object):
         icon13.addPixmap(QtGui.QPixmap("images/printer.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
         self.btn_print.setIcon(icon13)
         self.btn_print.setObjectName("btn_print")
+        self.btn_print.clicked.connect(self.btn_print_clicked)
         self.btn_backups = QtWidgets.QPushButton(self.groupBox)
         self.btn_backups.setGeometry(QtCore.QRect(135, 120, 121, 34))
         font = QtGui.QFont()

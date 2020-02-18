@@ -50,7 +50,6 @@ class Ui_FormLogin(object):
                     messagebox.showerror('ERRO', 'Senha incorreta para o usuário <{}>'.format(u.user))
                     tkinter.Tk().destroy()
                 else:
-                    dao_user.set_on(u)
                     from form_assisted import Ui_FormFicha
                     root = tkinter.Tk()
                     root.withdraw()
@@ -182,8 +181,6 @@ if __name__ == "__main__":
     dao_user.create_table_user()
     dao_assited.create_table_assisted()
     dao_interview.create_table_interview()
-    dao_interview.create_table_assisted_interview()
-    dao_user.set_off()
     app = QtWidgets.QApplication(sys.argv)
     FormLogin = QtWidgets.QMainWindow()
     ui = Ui_FormLogin()

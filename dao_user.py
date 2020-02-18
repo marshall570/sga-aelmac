@@ -9,7 +9,7 @@ db = Data()
 class DataAcessUser:
     def create_table_user(self):
         try:
-            table_sql = 'CREATE TABLE IF NOT EXISTS tb_usuarios (id_usuario INTEGER NOT NULL PRIMARY KEY, Nome TEXT, Usuario TEXT, Senha TEXT, Categoria TEXT, Status TEXT)'
+            table_sql = 'CREATE TABLE IF NOT EXISTS tb_usuarios (id_usuario INTEGER NOT NULL PRIMARY KEY, Nome TEXT, Usuario TEXT, Senha TEXT, Categoria TEXT)'
             
             conn = db.create_connection()
             cursor = conn.cursor()
@@ -58,7 +58,7 @@ class DataAcessUser:
 
     def insert_user(self, u):
         try:
-            sql_string = "INSERT INTO tb_usuarios VALUES ({}, '{}', '{}', '{}', '{}', 'OFF')".format(u.code, u.name, u.user, u.password, u.category)
+            sql_string = "INSERT INTO tb_usuarios VALUES ({}, '{}', '{}', '{}', '{}')".format(u.code, u.name, u.user, u.password, u.category)
 
             conn = db.create_connection()
             cursor = conn.cursor()
@@ -75,29 +75,29 @@ class DataAcessUser:
             db.close_connection(conn, cursor)    
        
             
-    def set_off(self):
-        try:
-            sql_string = "UPDATE tb_usuarios SET Status = 'OFF' WHERE Status = 'ON'"
+    # def set_off(self):
+    #     try:
+    #         sql_string = "UPDATE tb_usuarios SET Status = 'OFF' WHERE Status = 'ON'"
 
-            conn = db.create_connection()
-            cursor = conn.cursor()
-            cursor.execute(sql_string)
-            conn.commit()
-        except sql.Error as e:
-            print(e)
-        finally:
-            db.close_connection(conn, cursor) 
+    #         conn = db.create_connection()
+    #         cursor = conn.cursor()
+    #         cursor.execute(sql_string)
+    #         conn.commit()
+    #     except sql.Error as e:
+    #         print(e)
+    #     finally:
+    #         db.close_connection(conn, cursor) 
             
             
-    def set_on(self, u):
-        try:
-            sql_string = "UPDATE tb_usuarios SET Status = 'ON' WHERE Usuario = '{}'".format(u.user)
+    # def set_on(self, u):
+    #     try:
+    #         sql_string = "UPDATE tb_usuarios SET Status = 'ON' WHERE Usuario = '{}'".format(u.user)
 
-            conn = db.create_connection()
-            cursor = conn.cursor()
-            cursor.execute(sql_string)
-            conn.commit()
-        except sql.Error as e:
-            print(e)
-        finally:
-            db.close_connection(conn, cursor) 
+    #         conn = db.create_connection()
+    #         cursor = conn.cursor()
+    #         cursor.execute(sql_string)
+    #         conn.commit()
+    #     except sql.Error as e:
+    #         print(e)
+    #     finally:
+    #         db.close_connection(conn, cursor) 

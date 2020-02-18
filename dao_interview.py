@@ -9,20 +9,7 @@ db = Data()
 class DataAcessInterview:
     def create_table_interview(self):
         try:
-            table_sql = 'CREATE TABLE IF NOT EXISTS tb_entrevistas (id_entrevista INTEGER NOT NULL PRIMARY KEY, Entrevistador TEXT, Tratamento TEXT, Entrevista TEXT)'
-            
-            conn = db.create_connection()
-            cursor = conn.cursor()
-            cursor.execute(table_sql)
-        except sql.Error as e:
-            print(e)
-        finally:
-            db.close_connection(conn, cursor)
-
-
-    def create_table_assisted_interview(self):
-        try:
-            table_sql = 'CREATE TABLE IF NOT EXISTS tb_entrevistados (id_entrevistado INTEGER NOT NULL PRIMARY KEY, id_entrevista INTEGER, id_assistido INTEGER, FOREIGN KEY (id_entrevista) REFERENCES tb_entrevista (id_entrevista), FOREIGN KEY (id_assistido) REFERENCES tb_assistido (id_assistidos))'
+            table_sql = 'CREATE TABLE IF NOT EXISTS tb_entrevistas (id_entrevista INTEGER NOT NULL PRIMARY KEY, id_assistido TEXT NOT NULL, Entrevistador TEXT, Tratamento TEXT, Entrevista TEXT, FOREIGN KEY (id_assistido) REFERENCES tb_assistidos (id_assistido))'
             
             conn = db.create_connection()
             cursor = conn.cursor()

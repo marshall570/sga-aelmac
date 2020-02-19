@@ -3,19 +3,24 @@ import tkinter
 from PyQt5 import QtCore, QtGui, QtWidgets
 from dto_user import User
 from dto_assisted import Assisted
+from dto_interview import Interview
 from tkinter import messagebox
 from dao_assisted import DataAcessAssisted
+from dao_interview import DataAcessInterview
 
 # GLOBAL OBJECTS
-dao = DataAcessAssisted()
+dao_assisted = DataAcessAssisted()
+dao_interview = DataAcessInterview()
 a = Assisted()
+i = Interview()
 
 class Ui_FormFicha(object):
-    # FORM VARIABLES
+    # FORM VARIABLES    
     index = 0
     error_message = ''
     adding = False
     editing = False
+    writing_interview = False
     
     # PASSIVE METHODS
     def empty_form(self):
@@ -96,14 +101,15 @@ class Ui_FormFicha(object):
         self.txt_traits.setText('')
         
         self.txt_interviewer.setText('')
-        if self.radio_hl.isChecked():
-            self.radio_hl.toggle()        
-        if self.radio_p12.isChecked():
-            self.radio_p12.toggle()        
-        if self.radio_p3e.isChecked():
-            self.radio_p3e.toggle()        
-        if self.radio_p3f.isChecked():
-            self.radio_p3f.toggle()
+        self.cmb_treatment.setCurrentText('NENHUM')
+        # if self.radio_hl.isChecked():
+        #     self.radio_hl.toggle()        
+        # if self.radio_p12.isChecked():
+        #     self.radio_p12.toggle()        
+        # if self.radio_p3e.isChecked():
+        #     self.radio_p3e.toggle()        
+        # if self.radio_p3f.isChecked():
+        #     self.radio_p3f.toggle()
         self.txt_interview.setPlainText('EDITE UM REGISTRO EXISTENTE PARA ESCREVER NOVAS ENTREVISTAS')
         self.btn_save_interview.setEnabled(False)
         self.btn_new_interview.setEnabled(False)
@@ -172,8 +178,7 @@ class Ui_FormFicha(object):
         self.txt_info.setText('')                   
     
     def fill_form(self):
-        self.empty_form()
-        dao.select_assisted(a, self.index)
+        dao_assisted.select_assisted(a, self.index)
         
         self.txt_name.setText(a.name)
         self.txt_date.setText(a.date_of_birth)
@@ -277,17 +282,17 @@ class Ui_FormFicha(object):
         
         
         self.txt_interviewer.setText('')
-        if self.radio_hl.isChecked():
-            self.radio_hl.toggle()        
-        if self.radio_p12.isChecked():
-            self.radio_p12.toggle()        
-        if self.radio_p3e.isChecked():
-            self.radio_p3e.toggle()        
-        if self.radio_p3f.isChecked():
-            self.radio_p3f.toggle()
+        self.cmb_treatment.setCurrentText('NENHUM')
+        # if self.radio_hl.isChecked():
+        #     self.radio_hl.toggle()        
+        # if self.radio_p12.isChecked():
+        #     self.radio_p12.toggle()        
+        # if self.radio_p3e.isChecked():
+        #     self.radio_p3e.toggle()        
+        # if self.radio_p3f.isChecked():
+        #     self.radio_p3f.toggle()
         self.txt_interview.setText('')
         self.btn_save_interview.setEnabled(False)
-        self.btn_new_interview.setEnabled(True)
         
         
         if a.courses.find('Preparatório') != -1:
@@ -438,10 +443,12 @@ class Ui_FormFicha(object):
         self.txt_traits.setReadOnly(True)
         
         self.txt_interviewer.setReadOnly(True)
-        self.radio_hl.setEnabled(False)    
-        self.radio_p12.setEnabled(False)     
-        self.radio_p3e.setEnabled(False)
-        self.radio_p3f.setEnabled(False)
+        self.cmb_treatment.setEnabled(False)
+        # self.radio_hl.setEnabled(False)    
+        # self.radio_p12.setEnabled(False)     
+        # self.radio_p3e.setEnabled(False)
+        # self.radio_p3f.setEnabled(False)
+        self.tb_interviews.setEnabled(True)
         self.txt_interview.setReadOnly(True)
         self.btn_save_interview.setEnabled(False)
         self.btn_new_interview.setEnabled(False)
@@ -534,15 +541,16 @@ class Ui_FormFicha(object):
         self.check_panic_sindrome.setEnabled(True)
         self.txt_traits.setReadOnly(False)
         
-        self.txt_interviewer.setReadOnly(False)
-        self.radio_hl.setEnabled(False)    
-        self.radio_p12.setEnabled(False)     
-        self.radio_p3e.setEnabled(False)
-        self.radio_p3f.setEnabled(False)
-        self.txt_interview.setReadOnly(False)
-        self.tb_interviews.setEnabled(False)
+        self.txt_interviewer.setReadOnly(True)
+        self.cmb_treatment.setEnabled(False)
+        # self.radio_hl.setEnabled(False)    
+        # self.radio_p12.setEnabled(False)     
+        # self.radio_p3e.setEnabled(False)
+        # self.radio_p3f.setEnabled(False)
+        self.tb_interviews.setEnabled(True)
+        self.txt_interview.setReadOnly(True)
+        self.tb_interviews.setEnabled(True)
         self.btn_save_interview.setEnabled(False)
-        self.btn_new_interview.setEnabled(True)
                 
         self.check_preparatory.setEnabled(True)
         self.check_basic1.setEnabled(True)
@@ -579,7 +587,7 @@ class Ui_FormFicha(object):
         self.txt_info.setReadOnly(False)    
       
     def action_buttons(self):
-        if dao.id_gen_assisted() - 1 == 0:
+        if dao_assisted.id_gen_assisted() - 1 == 0:
             self.btn_add.setEnabled(True)
             self.btn_backups.setEnabled(True)
             self.btn_log_out.setEnabled(True)
@@ -603,7 +611,7 @@ class Ui_FormFicha(object):
             self.btn_delete.setEnabled(True)
         
     def navigation_buttons(self):
-        total = dao.id_gen_assisted() - 1
+        total = dao_assisted.id_gen_assisted() - 1
 
         if total <= 1:
             self.disable_navigation()
@@ -636,7 +644,7 @@ class Ui_FormFicha(object):
         treatments = ''
         guidance = ''
         
-        a.code = dao.id_gen_assisted()
+        a.code = dao_assisted.id_gen_assisted()
         
         a.name = self.txt_name.text().strip().upper()
         a.date_of_birth = self.txt_date.text().strip()
@@ -731,6 +739,12 @@ class Ui_FormFicha(object):
             traits = traits[5:]
         traits += self.txt_traits.toPlainText().strip()
         a.traits = traits
+        
+        
+        if self.adding == True:
+            a.latest_treatment = 'NENHUM'
+        else:
+            a.latest_treatment = self.cmb_treatment.currentText()
         
         
         if self.check_preparatory.isChecked():
@@ -896,25 +910,25 @@ class Ui_FormFicha(object):
     # BUTTONS METHODS    
     def btn_first_clicked(self):
         self.index = 1
-        dao.select_assisted(a, self.index)
+        dao_assisted.select_assisted(a, self.index)
         self.fill_form()
         self.navigation_buttons()
 
     def btn_previous_clicked(self):
         self.index -= 1
-        dao.select_assisted(a, self.index)
+        dao_assisted.select_assisted(a, self.index)
         self.fill_form()
         self.navigation_buttons()
 
     def btn_next_clicked(self):
         self.index += 1
-        dao.select_assisted(a, self.index)
+        dao_assisted.select_assisted(a, self.index)
         self.fill_form()
         self.navigation_buttons()
 
     def btn_last_clicked(self):
-        self.index = dao.id_gen_assisted() - 1
-        dao.select_assisted(a, self.index)
+        self.index = dao_assisted.id_gen_assisted() - 1
+        dao_assisted.select_assisted(a, self.index)
         self.fill_form()
         self.navigation_buttons()    
     
@@ -926,7 +940,7 @@ class Ui_FormFicha(object):
                 
         if choice == 'yes':
             from form_login import Ui_FormLogin
-            dao.set_off()
+            # dao.set_off()
             FormFicha.close()
             self.FormLogin = QtWidgets.QMainWindow()
             self.ui = Ui_FormLogin()
@@ -952,6 +966,11 @@ class Ui_FormFicha(object):
         self.empty_form()        
         self.disable_navigation()
         
+        self.txt_interviewer.setReadOnly(True)
+        self.txt_interview.setReadOnly(True)
+        self.cmb_treatment.setEnabled(False)
+        self.tb_interviews.setEnabled(False)
+                
         self.adding = True
         
         self.txt_name.setFocus()
@@ -968,12 +987,15 @@ class Ui_FormFicha(object):
     def btn_cancel_clicked(self):
         self.enable_read_only()
         self.navigation_buttons()
-        self.action_buttons()
+        self.action_buttons()        
         
         self.adding = False
         self.editing = False
         
-        if dao.id_gen_assisted() - 1 <= 0:
+        if self.writing_interview:
+            self.btn_new_interview_clicked()
+        
+        if dao_assisted.id_gen_assisted() - 1 <= 0:
             self.empty_form()
         else:
             self.btn_last_clicked()   
@@ -993,13 +1015,13 @@ class Ui_FormFicha(object):
             if choice == 'yes':
                 if self.adding:
                     self.get_values(a)
-                    dao.insert_assisted(a)
+                    dao_assisted.insert_assisted(a)
                     self.btn_last_clicked()
                     self.btn_cancel_clicked()
                     self.adding = False      
                 elif self.editing:
                     self.get_values(a)
-                    dao.edit_assisted(a)
+                    dao_assisted.edit_assisted(a)
                     self.btn_last_clicked()
                     self.btn_cancel_clicked()
                     self.editing = False
@@ -1011,8 +1033,8 @@ class Ui_FormFicha(object):
         tkinter.Tk().destroy()
         
         if choice == 'yes':
-            dao.delete_assisted(self.index)
-            if dao.id_gen_assisted() - 1 == 0:
+            dao_assisted.delete_assisted(self.index)
+            if dao_assisted.id_gen_assisted() - 1 == 0:
                 self.empty_form()
                 self.action_buttons()
                 self.navigation_buttons()
@@ -1020,9 +1042,9 @@ class Ui_FormFicha(object):
                 self.lbl_index.setText('0')    
                 self.lbl_total_index.setText('0')    
             else:
-                if self.index > dao.id_gen_assisted() - 1:
+                if self.index > dao_assisted.id_gen_assisted() - 1:
                     self.index -= 1
-                elif self.index < dao.id_gen_assisted() - 1:
+                elif self.index < dao_assisted.id_gen_assisted() - 1:
                     self.index += 1                    
                 else:
                     self.index = self.index
@@ -1036,6 +1058,8 @@ class Ui_FormFicha(object):
         self.disable_read_only()
         
         self.editing = True
+        self.btn_new_interview.setEnabled(True)
+
         
         self.txt_name.setFocus()
         self.btn_add.setEnabled(False)
@@ -1049,7 +1073,7 @@ class Ui_FormFicha(object):
         self.btn_delete.setEnabled(False)
         
     def btn_print_clicked(self):
-        dao.print_register(a)                   
+        dao_assisted.print_register(a)                   
 
     def radio_addictions_no_toggled(self):
         if self.check_alcohol.isChecked():
@@ -1085,6 +1109,81 @@ class Ui_FormFicha(object):
         self.check_drugs.setEnabled(True)
         self.check_sex.setEnabled(True)
 
+    def btn_new_interview_clicked(self):
+        if not self.writing_interview:
+            new_icon = QtGui.QIcon()
+            new_icon.addPixmap(QtGui.QPixmap("images/cancel.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+            self.btn_new_interview.setIcon(new_icon)
+            self.btn_new_interview.setText('CANCELAR')
+            
+            self.txt_interviewer.setReadOnly(False)
+            self.cmb_treatment.setEnabled(True)
+            self.txt_interview.setReadOnly(False)
+            self.tb_interviews.setEnabled(False)
+            self.btn_save_interview.setEnabled(True)
+            self.btn_new_interview.setEnabled(True)
+            
+            self.writing_interview = True
+        else:
+            new_icon = QtGui.QIcon()
+            new_icon.addPixmap(QtGui.QPixmap("images/pencil.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+            self.btn_new_interview.setIcon(new_icon)
+            self.btn_new_interview.setText('NOVA ENTREVISTA')
+            
+            self.txt_interviewer.setReadOnly(True)
+            self.cmb_treatment.setEnabled(False)
+            self.txt_interview.setReadOnly(True)
+            self.tb_interviews.setEnabled(True)
+            self.btn_save_interview.setEnabled(False)
+            self.btn_new_interview.setEnabled(True)
+            
+            self.writing_interview = False
+
+    def btn_save_interview_clicked(self):
+        if len(self.txt_interviewer.text().strip()) < 1 or len(self.txt_interview.toPlainText().strip()) < 1:
+            root = tkinter.Tk()
+            root.withdraw()
+            messagebox.showerror('ERRO', 'Os campos ENTREVISTADOR e ENTREVISTA precisam estar PREENCHIDOS')        
+            tkinter.Tk().destroy()        
+        else:
+            root = tkinter.Tk()
+            root.withdraw()
+            choice = messagebox.askquestion('REGISTRAR ENTREVISTA', 'Deseja registrar esta entrevista?')
+            tkinter.Tk().destroy()
+        
+            if choice == 'yes':                
+                from datetime import datetime            
+                today = datetime.now().strftime('%d/%m/%Y')
+                
+                i.code = dao_interview.id_gen_interview()
+                i.date = today
+                i.interviewer = self.txt_interviewer.text().strip().upper()
+                i.treatment = self.cmb_treatment.currentText()
+                i.interview = self.txt_interview.toPlainText().strip().upper()
+                
+                dao_interview.insert_interview(i, a)
+                self.btn_new_interview_clicked()
+                self.btn_cancel_clicked()
+                self.tabWidget.setCurrentIndex(2)
+
+    def fill_table_view(self):
+        query_result = dao_interview.select_interview()
+        self.tb_interviews.setRowCount(len(query_result))
+        
+        row = 0
+        for tup in query_result:
+            col = 0
+            for item in tup:
+                cell = QtWidgets.QTableWidgetItem(item)
+                cell.setFlags(QtCore.Qt.ItemIsEnabled)
+                self.tb_interviews.setItem(row, col, cell)
+                col += 1
+            row += 1
+            
+            
+            
+            
+                                    
 
     def setupUi(self, FormFicha):
         FormFicha.setObjectName("FormFicha")
@@ -1784,27 +1883,42 @@ class Ui_FormFicha(object):
         self.label_41.setGeometry(QtCore.QRect(10, 37, 131, 18))
         self.label_41.setObjectName("label_41")
         self.txt_interviewer = QtWidgets.QLineEdit(self.groupBox_11)
-        self.txt_interviewer.setGeometry(QtCore.QRect(140, 30, 291, 32))
+        self.txt_interviewer.setGeometry(QtCore.QRect(140, 30, 290, 32))
         font = QtGui.QFont()
         font.setPointSize(11)
         font.setBold(False)
         font.setWeight(50)
         self.txt_interviewer.setFont(font)
         self.txt_interviewer.setObjectName("txt_interviewer")
-        self.radio_hl = QtWidgets.QRadioButton(self.groupBox_11)
-        self.radio_hl.setGeometry(QtCore.QRect(60, 70, 51, 22))
-        self.radio_hl.setObjectName("radio_hl")
-        self.radio_p12 = QtWidgets.QRadioButton(self.groupBox_11)
-        self.radio_p12.setGeometry(QtCore.QRect(140, 70, 71, 22))
-        self.radio_p12.setObjectName("radio_p12")
-        self.radio_p3e = QtWidgets.QRadioButton(self.groupBox_11)
-        self.radio_p3e.setGeometry(QtCore.QRect(230, 70, 71, 22))
-        self.radio_p3e.setObjectName("radio_p3e")
-        self.radio_p3f = QtWidgets.QRadioButton(self.groupBox_11)
-        self.radio_p3f.setGeometry(QtCore.QRect(310, 70, 71, 22))
-        self.radio_p3f.setObjectName("radio_p3f")
+        self.label_42 = QtWidgets.QLabel(self.groupBox_11)
+        self.label_42.setGeometry(QtCore.QRect(10, 83, 131, 18))
+        self.label_42.setObjectName("label_42")
+        self.cmb_treatment = QtWidgets.QComboBox(self.groupBox_11)
+        self.cmb_treatment.setGeometry(QtCore.QRect(120, 77, 310, 32))
+        self.cmb_treatment.setObjectName("cmb_treatment")
+        self.cmb_treatment.addItem("")
+        self.cmb_treatment.addItem("")
+        self.cmb_treatment.addItem("")
+        self.cmb_treatment.addItem("")
+        self.cmb_treatment.addItem("")
+        # self.radio_hl = QtWidgets.QRadioButton(self.groupBox_11)
+        # self.radio_hl.setGeometry(QtCore.QRect(60, 70, 51, 22))
+        # self.radio_hl.setObjectName("radio_hl")
+        # self.radio_hl.setVisible(False)
+        # self.radio_p12 = QtWidgets.QRadioButton(self.groupBox_11)
+        # self.radio_p12.setGeometry(QtCore.QRect(140, 70, 71, 22))
+        # self.radio_p12.setObjectName("radio_p12")
+        # self.radio_p12.setVisible(False)
+        # self.radio_p3e = QtWidgets.QRadioButton(self.groupBox_11)
+        # self.radio_p3e.setGeometry(QtCore.QRect(230, 70, 71, 22))
+        # self.radio_p3e.setObjectName("radio_p3e")
+        # self.radio_p3e.setVisible(False)
+        # self.radio_p3f = QtWidgets.QRadioButton(self.groupBox_11)
+        # self.radio_p3f.setGeometry(QtCore.QRect(310, 70, 71, 22))
+        # self.radio_p3f.setObjectName("radio_p3f")
+        # self.radio_p3f.setVisible(False)
         self.txt_interview = QtWidgets.QTextEdit(self.groupBox_11)
-        self.txt_interview.setGeometry(QtCore.QRect(10, 100, 421, 231))
+        self.txt_interview.setGeometry(QtCore.QRect(10, 120, 421, 209))
         font = QtGui.QFont()
         font.setPointSize(11)
         font.setBold(False)
@@ -1820,6 +1934,8 @@ class Ui_FormFicha(object):
         icon2.addPixmap(QtGui.QPixmap("images/pencil.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
         self.btn_new_interview.setIcon(icon2)
         self.btn_new_interview.setObjectName("btn_new_interview")
+        self.btn_new_interview.clicked.connect(self.btn_new_interview_clicked)
+        self.btn_new_interview.setEnabled(False)        
         self.btn_save_interview = QtWidgets.QPushButton(self.groupBox_11)
         self.btn_save_interview.setGeometry(QtCore.QRect(230, 340, 201, 34))
         font = QtGui.QFont()
@@ -1829,6 +1945,7 @@ class Ui_FormFicha(object):
         self.btn_save_interview.setFont(font)
         self.btn_save_interview.setIcon(icon20)
         self.btn_save_interview.setObjectName("btn_save_interview")
+        self.btn_save_interview.clicked.connect(self.btn_save_interview_clicked)
         self.groupBox_12 = QtWidgets.QGroupBox(self.tab_interviews)
         self.groupBox_12.setGeometry(QtCore.QRect(460, 10, 405, 385))
         font = QtGui.QFont()
@@ -1846,7 +1963,7 @@ class Ui_FormFicha(object):
         font.setWeight(50)
         self.tb_interviews.setFont(font)
         self.tb_interviews.setObjectName("tb_interviews")
-        self.tb_interviews.setColumnCount(3)
+        self.tb_interviews.setColumnCount(4)
         self.tb_interviews.setRowCount(0)
         item = QtWidgets.QTableWidgetItem()
         self.tb_interviews.setHorizontalHeaderItem(0, item)
@@ -1854,6 +1971,8 @@ class Ui_FormFicha(object):
         self.tb_interviews.setHorizontalHeaderItem(1, item)
         item = QtWidgets.QTableWidgetItem()
         self.tb_interviews.setHorizontalHeaderItem(2, item)
+        item = QtWidgets.QTableWidgetItem()
+        self.tb_interviews.setHorizontalHeaderItem(3, item)
         icon3 = QtGui.QIcon()
         icon3.addPixmap(QtGui.QPixmap("images/overlays.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
         self.tabWidget.addTab(self.tab_interviews, icon3, "")
@@ -2427,16 +2546,17 @@ class Ui_FormFicha(object):
 
         
         self.enable_read_only()
-        if dao.id_gen_assisted() - 1 != 0:
+        if dao_assisted.id_gen_assisted() - 1 != 0:
             self.btn_last_clicked()            
-            self.lbl_index.setText(str(dao.id_gen_assisted()))    
-            self.lbl_total_index.setText(str(dao.id_gen_assisted()))    
+            self.lbl_index.setText(str(dao_assisted.id_gen_assisted() - 1))    
+            self.lbl_total_index.setText(str(dao_assisted.id_gen_assisted() - 1))    
         else:
             self.empty_form()
             self.disable_navigation()
             self.lbl_index.setText('0')    
             self.lbl_total_index.setText('0')    
-        self.action_buttons()
+        self.action_buttons()    
+        self.fill_table_view()
         
 
         self.retranslateUi(FormFicha)
@@ -2447,7 +2567,7 @@ class Ui_FormFicha(object):
 
     def retranslateUi(self, FormFicha):
         _translate = QtCore.QCoreApplication.translate
-        FormFicha.setWindowTitle(_translate("FormFicha", "MainWindow"))
+        FormFicha.setWindowTitle(_translate("FormFicha", "GERENCIAMENTO DE ASSISTIDOS"))
         self.label_4.setText(_translate("FormFicha", "NOME"))
         self.label_5.setText(_translate("FormFicha", "DATA DE NASCIMENTO"))
         self.txt_date.setInputMask(_translate("FormFicha", "##/##/####"))
@@ -2544,18 +2664,26 @@ class Ui_FormFicha(object):
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab_extra_info), _translate("FormFicha", "Informações Extras"))
         self.groupBox_11.setTitle(_translate("FormFicha", "ENTREVISTA"))
         self.label_41.setText(_translate("FormFicha", "ENTREVISTADOR"))
-        self.radio_hl.setText(_translate("FormFicha", "HL"))
-        self.radio_p12.setText(_translate("FormFicha", "P1/2"))
-        self.radio_p3e.setText(_translate("FormFicha", "P3E"))
-        self.radio_p3f.setText(_translate("FormFicha", "P3F"))
+        self.label_42.setText(_translate("FormFicha", "TRATAMENTO"))
+        self.cmb_treatment.setItemText(0, _translate("FormFicha", "NENHUM"))
+        self.cmb_treatment.setItemText(1, _translate("FormFicha", "HL"))
+        self.cmb_treatment.setItemText(2, _translate("FormFicha", "P1/2"))
+        self.cmb_treatment.setItemText(3, _translate("FormFicha", "P3E"))
+        self.cmb_treatment.setItemText(4, _translate("FormFicha", "P3F"))
+        # self.radio_hl.setText(_translate("FormFicha", "HL"))
+        # self.radio_p12.setText(_translate("FormFicha", "P1/2"))
+        # self.radio_p3e.setText(_translate("FormFicha", "P3E"))
+        # self.radio_p3f.setText(_translate("FormFicha", "P3F"))
         self.btn_new_interview.setText(_translate("FormFicha", "NOVA ENTREVISTA"))
         self.btn_save_interview.setText(_translate("FormFicha", "SALVAR"))
         self.groupBox_12.setTitle(_translate("FormFicha", "ENTREVISTAS ANTERIORES"))
         item = self.tb_interviews.horizontalHeaderItem(0)
-        item.setText(_translate("FormFicha", "ENTREVISTADOR"))
+        item.setText(_translate("FormFicha", "DATA"))
         item = self.tb_interviews.horizontalHeaderItem(1)
-        item.setText(_translate("FormFicha", "TRATAMENTO"))
+        item.setText(_translate("FormFicha", "ENTREVISTADOR"))
         item = self.tb_interviews.horizontalHeaderItem(2)
+        item.setText(_translate("FormFicha", "TRATAMENTO"))
+        item = self.tb_interviews.horizontalHeaderItem(3)
         item.setText(_translate("FormFicha", "ENTREVISTA"))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab_interviews), _translate("FormFicha", "Entrevistas"))
         self.groupBox_19.setTitle(_translate("FormFicha", "ENCAMINHAMENTO"))
@@ -2614,8 +2742,8 @@ class Ui_FormFicha(object):
         self.btn_previous.setText(_translate("FormFicha", "ANTERIOR"))
         self.btn_next.setText(_translate("FormFicha", "PRÓXIMO"))
         self.btn_last.setText(_translate("FormFicha", "ÚLTIMO"))
-        self.lbl_index.setText(_translate("FormFicha", "0"))
-        self.lbl_total_index.setText(_translate("FormFicha", "0"))
+        # self.lbl_index.setText(_translate("FormFicha", "0"))
+        # self.lbl_total_index.setText(_translate("FormFicha", "0"))
         self.label_3.setText(_translate("FormFicha", "DE"))
 
 

@@ -54,16 +54,16 @@ class DataAcessInterview:
             db.close_connection(conn, cursor)
             
             
-    def select_interview(self):
+    def select_interview(self, a):
         try:
+            select_string = 'SELECT Data_da_Entrevista, Entrevistador, Tratamento, Entrevista FROM tb_entrevistas WHERE id_assistido = ' + str(a.code)
+            
             conn = db.create_connection()
             cursor = conn.cursor()
-            rs = cursor.execute('SELECT Data_da_Entrevista, Entrevistador, Tratamento, Entrevista FROM tb_entrevistas WHERE id_assistido = 1').fetchall()            
+            rs = cursor.execute(select_string).fetchall()
             return rs
         except sql.Error as e:
             print(e)
         finally:
             db.close_connection(conn, cursor)
-             
-             
-DataAcessInterview.select_interview(DataAcessInterview)
+        

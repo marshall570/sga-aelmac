@@ -7,6 +7,7 @@ from dto_interview import Interview
 from tkinter import messagebox
 from dao_assisted import DataAcessAssisted
 from dao_interview import DataAcessInterview
+from time import sleep
 
 # GLOBAL OBJECTS
 dao_assisted = DataAcessAssisted()
@@ -15,14 +16,19 @@ a = Assisted()
 i = Interview()
 
 class Ui_FormFicha(object):
+    ####################################################    
     # FORM VARIABLES    
+    ####################################################    
     index = 0
     error_message = ''
     adding = False
     editing = False
     writing_interview = False
     
+    
+    ####################################################    
     # PASSIVE METHODS
+    ####################################################
     def empty_form(self):
         self.txt_name.setText('')
         self.txt_date.setText('')
@@ -179,6 +185,8 @@ class Ui_FormFicha(object):
     
     def fill_form(self):
         dao_assisted.select_assisted(a, self.index)
+        self.clear_table_view()
+        self.fill_table_view()
         
         self.txt_name.setText(a.name)
         self.txt_date.setText(a.date_of_birth)
@@ -906,8 +914,23 @@ class Ui_FormFicha(object):
             i += 1
         return txt
     
+    def fill_table_view(self):
+        query_result = dao_interview.select_interview(a)        
+ 
+        for value in query_result:
+            row = []
+            for item in value:
+                cell = QtGui.QStandardItem(str(item))
+                row.append(cell)
+            self.model.appendRow(row)     
 
+    def clear_table_view(self):
+        # query_result = dao_interview.select_interview()        
+        self.model.removeRows(0, self.model.rowCount())
+    
+    ####################################################
     # BUTTONS METHODS    
+    ####################################################
     def btn_first_clicked(self):
         self.index = 1
         dao_assisted.select_assisted(a, self.index)
@@ -964,7 +987,8 @@ class Ui_FormFicha(object):
     def btn_add_clicked(self):
         self.disable_read_only()
         self.empty_form()        
-        self.disable_navigation()
+        self.disable_navigation()                
+        self.clear_table_view()    
         
         self.txt_interviewer.setReadOnly(True)
         self.txt_interview.setReadOnly(True)
@@ -1166,24 +1190,20 @@ class Ui_FormFicha(object):
                 self.btn_cancel_clicked()
                 self.tabWidget.setCurrentIndex(2)
 
-    def fill_table_view(self):
-        query_result = dao_interview.select_interview()
-        self.tb_interviews.setRowCount(len(query_result))
+    def cell_double_clicked(self, signal):
+        row = signal.row()
+        values = []
         
-        row = 0
-        for tup in query_result:
-            col = 0
-            for item in tup:
-                cell = QtWidgets.QTableWidgetItem(item)
-                cell.setFlags(QtCore.Qt.ItemIsEnabled)
-                self.tb_interviews.setItem(row, col, cell)
-                col += 1
-            row += 1
+        for i in range(4):
+            index = signal.sibling(row , i)
+            index_dict = self.model.itemData(index)
+            values.append(index_dict.get(0))
             
-            
-            
-            
-                                    
+        self.txt_interviewer.setText(values[1])
+        self.cmb_treatment.setCurrentText(values[2])
+        self.txt_interview.setPlainText(values[3])                            
+    
+
 
     def setupUi(self, FormFicha):
         FormFicha.setObjectName("FormFicha")
@@ -1955,24 +1975,21 @@ class Ui_FormFicha(object):
         font.setWeight(75)
         self.groupBox_12.setFont(font)
         self.groupBox_12.setObjectName("groupBox_12")
-        self.tb_interviews = QtWidgets.QTableWidget(self.groupBox_12)
+        self.tb_interviews = QtWidgets.QTableView(self.groupBox_12)
         self.tb_interviews.setGeometry(QtCore.QRect(10, 30, 385, 345))
+        self.model = QtGui.QStandardItemModel(self.groupBox_12)
+        self.model.setHorizontalHeaderLabels(['DATA', 'ENTREVISTADOR', 'TRATAMENTO', 'ENTREVISTA'])                
+        self.tb_interviews.setEditTriggers(QtWidgets.QAbstractItemView.NoEditTriggers)
+        self.tb_interviews.setSelectionBehavior(QtWidgets.QAbstractItemView.SelectRows)
+        self.tb_interviews.setSelectionMode(QtWidgets.QAbstractItemView.SingleSelection)
+        self.tb_interviews.setModel(self.model)
         font = QtGui.QFont()
         font.setPointSize(11)
         font.setBold(False)
         font.setWeight(50)
         self.tb_interviews.setFont(font)
         self.tb_interviews.setObjectName("tb_interviews")
-        self.tb_interviews.setColumnCount(4)
-        self.tb_interviews.setRowCount(0)
-        item = QtWidgets.QTableWidgetItem()
-        self.tb_interviews.setHorizontalHeaderItem(0, item)
-        item = QtWidgets.QTableWidgetItem()
-        self.tb_interviews.setHorizontalHeaderItem(1, item)
-        item = QtWidgets.QTableWidgetItem()
-        self.tb_interviews.setHorizontalHeaderItem(2, item)
-        item = QtWidgets.QTableWidgetItem()
-        self.tb_interviews.setHorizontalHeaderItem(3, item)
+        self.tb_interviews.doubleClicked.connect(self.cell_double_clicked)    
         icon3 = QtGui.QIcon()
         icon3.addPixmap(QtGui.QPixmap("images/overlays.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
         self.tabWidget.addTab(self.tab_interviews, icon3, "")
@@ -2555,9 +2572,7 @@ class Ui_FormFicha(object):
             self.disable_navigation()
             self.lbl_index.setText('0')    
             self.lbl_total_index.setText('0')    
-        self.action_buttons()    
-        self.fill_table_view()
-        
+        self.action_buttons()                                    
 
         self.retranslateUi(FormFicha)
         self.tabWidget.setCurrentIndex(0)
@@ -2677,14 +2692,14 @@ class Ui_FormFicha(object):
         self.btn_new_interview.setText(_translate("FormFicha", "NOVA ENTREVISTA"))
         self.btn_save_interview.setText(_translate("FormFicha", "SALVAR"))
         self.groupBox_12.setTitle(_translate("FormFicha", "ENTREVISTAS ANTERIORES"))
-        item = self.tb_interviews.horizontalHeaderItem(0)
-        item.setText(_translate("FormFicha", "DATA"))
-        item = self.tb_interviews.horizontalHeaderItem(1)
-        item.setText(_translate("FormFicha", "ENTREVISTADOR"))
-        item = self.tb_interviews.horizontalHeaderItem(2)
-        item.setText(_translate("FormFicha", "TRATAMENTO"))
-        item = self.tb_interviews.horizontalHeaderItem(3)
-        item.setText(_translate("FormFicha", "ENTREVISTA"))
+        # item = self.tb_interviews.horizontalHeaderItem(0)
+        # item.setText(_translate("FormFicha", "DATA"))
+        # item = self.tb_interviews.horizontalHeaderItem(1)
+        # item.setText(_translate("FormFicha", "ENTREVISTADOR"))
+        # item = self.tb_interviews.horizontalHeaderItem(2)
+        # item.setText(_translate("FormFicha", "TRATAMENTO"))
+        # item = self.tb_interviews.horizontalHeaderItem(3)
+        # item.setText(_translate("FormFicha", "ENTREVISTA"))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab_interviews), _translate("FormFicha", "Entrevistas"))
         self.groupBox_19.setTitle(_translate("FormFicha", "ENCAMINHAMENTO"))
         self.check_directors.setText(_translate("FormFicha", "Diretoria"))

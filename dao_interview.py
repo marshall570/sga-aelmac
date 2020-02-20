@@ -9,7 +9,7 @@ db = Data()
 class DataAcessInterview:
     def create_table_interview(self):
         try:
-            table_sql = 'CREATE TABLE IF NOT EXISTS tb_entrevistas (id_entrevista INTEGER NOT NULL PRIMARY KEY, id_assistido INTEGER NOT NULL, Data_da_Entrevista TEXT, Entrevistador TEXT, Tratamento TEXT, Entrevista TEXT, FOREIGN KEY (id_assistido) REFERENCES tb_assistidos (id_assistido))'
+            table_sql = 'CREATE TABLE IF NOT EXISTS tb_entrevistas (id_entrevista INTEGER NOT NULL PRIMARY KEY, id_assistido INTEGER NOT NULL, Data_da_entrevista TEXT, Entrevistador TEXT, Tratamento TEXT, Entrevista TEXT, FOREIGN KEY (id_assistido) REFERENCES tb_assistidos (id_assistido))'
             
             conn = db.create_connection()
             cursor = conn.cursor()
@@ -56,7 +56,7 @@ class DataAcessInterview:
             
     def select_interview(self, a):
         try:
-            select_string = 'SELECT Data_da_Entrevista, Entrevistador, Tratamento, Entrevista FROM tb_entrevistas WHERE id_assistido = ' + str(a.code)
+            select_string = 'SELECT Data_da_entrevista, Entrevistador, Tratamento, Entrevista FROM tb_entrevistas WHERE id_assistido = ' + str(a.code)
             
             conn = db.create_connection()
             cursor = conn.cursor()

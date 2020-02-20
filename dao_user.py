@@ -72,7 +72,31 @@ class DataAcessUser:
         except sql.Error as e:
             print(e)
         finally:
-            db.close_connection(conn, cursor)    
+            db.close_connection(conn, cursor)
+            
+            
+    def select_user(self, user):
+        try:
+            conn = db.create_connection()
+            cursor = conn.cursor()
+            rs = cursor.execute("SELECT Usuario, Senha, Categoria FROM tb_usuarios WHERE Usuario = '{}'".format(user)).fetchone()
+            return rs
+        except sql.Error as e:
+            print(e)
+        finally:
+            db.close_connection(conn, cursor)
+
+    def count_user(self, user):
+        try:
+            conn = db.create_connection()
+            cursor = conn.cursor()
+            rs = cursor.execute("SELECT COUNT(*) FROM tb_usuarios WHERE Usuario = '{}'".format(user)).fetchone()[0]
+            return rs
+        except sql.Error as e:
+            print(e)
+        finally:
+            db.close_connection(conn, cursor)
+    
        
             
     # def set_off(self):

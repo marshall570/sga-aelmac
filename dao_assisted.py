@@ -82,36 +82,45 @@ class DataAcessAssisted:
         try:
             conn = db.create_connection()
             cursor = conn.cursor()
-            rs = cursor.execute('SELECT * FROM tb_assistidos WHERE id_assistido = {}'.format(i)).fetchone()
-                                                            
-            a.code = rs[0]
-            a.name = rs[1]
-            a.date_of_birth = rs[2]
-            a.phone1 = rs[3]
-            a.phone2 = rs[4]
-            a.gender = rs[5]
-            a.civil_state = rs[6]
-            a.ocupation = rs[7]
-            a.lives_with = rs[8]
-            a.address = rs[9]
-            a.neighbourhood = rs[10]
-            a.number = rs[11]
-            a.city = rs[12]
-            a.state = rs[13]
-            a.sedatives = rs[14]
-            a.medical_treatment = rs[15]
-            a.sleep_well = rs[16]
-            a.addictions = rs[17]
-            a.dreams = rs[18]
-            a.work = rs[19]
-            a.family = rs[20]
-            a.feeding = rs[21]
-            a.traits = rs[22]
-            a.latest_treatment = rs[23]
-            a.courses = rs[24]
-            a.fowarding = rs[25]
-            a.treatment = rs[26]
-            a.guidance = rs[27]
+            rs = cursor.execute('SELECT * FROM tb_assistidos WHERE id_assistido = {}'.format(i)).fetchone()                                        
+
+            new_values = []            
+            for value in rs:
+                if value == None:
+                    item = ''
+                else:
+                    item = value
+                new_values.append(item)
+            
+                                                                     
+            a.code = new_values[0]
+            a.name = new_values[1]
+            a.date_of_birth = new_values[2]
+            a.phone1 = new_values[3]
+            a.phone2 = new_values[4]
+            a.gender = new_values[5]
+            a.civil_state = new_values[6]
+            a.ocupation = new_values[7]
+            a.lives_with = new_values[8]
+            a.address = new_values[9]
+            a.neighbourhood = new_values[10]
+            a.number = new_values[11]
+            a.city = new_values[12]
+            a.state = new_values[13]
+            a.sedatives = new_values[14]
+            a.medical_treatment = new_values[15]
+            a.sleep_well = new_values[16]
+            a.addictions = new_values[17]
+            a.dreams = new_values[18]
+            a.work = new_values[19]
+            a.family = new_values[20]
+            a.feeding = new_values[21]
+            a.traits = new_values[22]
+            a.latest_treatment = new_values[23]
+            a.courses = new_values[24]
+            a.fowarding = new_values[25]
+            a.treatment = new_values[26]
+            a.guidance = new_values[27]
         except sql.Error as e:
             print(e)
         finally:
@@ -120,15 +129,22 @@ class DataAcessAssisted:
    
     def delete_assisted(self, i):
         try:
-            temp_id = i
-            sql_string = 'DELETE FROM tb_assistidos WHERE id_assistido = ' + str(temp_id)
+            sql_string = 'DELETE FROM tb_assistidos WHERE id_assistido = ' + str(i)
             
             conn = db.create_connection()
             cursor = conn.cursor()
             cursor.execute(sql_string)
             conn.commit()
             
-            sql_string = 'UPDATE tb_assistidos SET id_assistido = id_assistido - 1 WHERE id_assistido > ' + str(temp_id)
+            sql_string = 'DELETE FROM tb_entrevistas WHERE id_assistido = ' + str(i)
+            cursor.execute(sql_string)
+            conn.commit()                        
+            
+            sql_string = 'UPDATE tb_assistidos SET id_assistido = id_assistido - 1 WHERE id_assistido > ' + str(i)
+            cursor.execute(sql_string)
+            conn.commit()
+
+            sql_string = 'UPDATE tb_entrevistas SET id_assistido = id_assistido - 1 WHERE id_assistido > ' + str(i)
             cursor.execute(sql_string)
             conn.commit()
             
@@ -237,9 +253,9 @@ class DataAcessAssisted:
             db_df = pd.read_sql_query(custom_string, conn)
 
             if platform.system() == 'Linux':
-                db_df.to_csv(os.path.expanduser("~") + '/Documentos/GERENCIAMENTO_DE_ASSISTIDOS_AELMAC/RELATORIOS/FILTRAGEM_POR_' + selected_filter.upper() + '_' + today + '.csv', index=False)
+                db_df.to_excel(os.path.expanduser("~") + '/Documentos/GERENCIAMENTO_DE_ASSISTIDOS_AELMAC/RELATORIOS/FILTRAGEM_POR_' + selected_filter.upper() + '_' + today + '.xlsx', index=False)
             else:
-                db_df.to_csv(os.path.expanduser("~") + '\\Documents\\Pedidos_AELMAC\\EXCEL\\Pedidos_EXCEL_' + selected_filter.upper() + '_' + today + '.csv', index=False)
+                db_df.to_excel(os.path.expanduser("~") + '\\Documents\\Pedidos_AELMAC\\EXCEL\\Pedidos_EXCEL_' + selected_filter.upper() + '_' + today + '.xlsx', index=False)
 
             
             root = tkinter.Tk()
@@ -250,9 +266,78 @@ class DataAcessAssisted:
             db.close_connection(conn)
         except sql.Error as e:
             print(e)
+            
+            
+    def export_data(self):
+        try:            
+            today = datetime.datetime.now().strftime("%d-%m-%y")            
+            
+            
+            if platform.system() == 'Linux':
+                if not os.path.exists(os.path.expanduser("~") + '/Documentos/GERENCIAMENTO_DE_ASSISTIDOS_AELMAC/BACKUPS/'):
+                    os.mkdir(os.path.expanduser("~") + '/Documentos/GERENCIAMENTO_DE_ASSISTIDOS_AELMAC/BACKUPS/')
+            else:
+                if not os.path.isdir(os.path.expanduser("~") + '\\Documents\\Pedidos_AELMAC\\EXCEL'):
+                    os.mkdir(os.path.expanduser("~") + '\\Documents\\Pedidos_AELMAC\\EXCEL')
+
+            conn = db.create_connection()
+            db_df_assisted = pd.read_sql_query('SELECT * FROM tb_assistidos', conn)
+            db_df_interview = pd.read_sql_query('SELECT * FROM tb_entrevistas', conn)
+
+            if platform.system() == 'Linux':
+                writer = pd.ExcelWriter(os.path.expanduser("~") + '/Documentos/GERENCIAMENTO_DE_ASSISTIDOS_AELMAC/BACKUPS/BACKUP' + '_' + today + '.xlsx', engine='xlsxwriter')                
+                db_df_assisted.to_excel(writer, sheet_name = 'tb_assistidos', index = None, header = True)
+                db_df_interview.to_excel(writer, sheet_name = 'tb_entrevistas', index = None, header = True)
+                
+                workbook = writer.book
+                worksheet = writer.sheets['tb_assistidos']
+                
+                format_text = workbook.add_format()
+                format_text.set_num_format('@')
+                worksheet.set_column('B:AB', None, format_text)
+                
+                writer.save()
+            else:
+                db_df_assisted.to_excel(os.path.expanduser("~") + '\\Documents\\Pedidos_AELMAC\\EXCEL\\BACKUPS' + '_' + today + '.xlsx', index=False)
+
+            root = tkinter.Tk()
+            root.withdraw()
+            messagebox.showinfo('SUCESSO', 'BACKUP do banco de dados gerado com sucesso!\nSaindo do gerenciador de backups...')        
+            tkinter.Tk().destroy()
+            
+            db.close_connection(conn)
+        except sql.Error as e:
+            print(e)
         
    
-   
+    def import_data(self, file):
+        try:            
+            conn = db.create_connection()
+            cursor = conn.cursor()
+            cursor.execute('DROP TABLE tb_assistidos')
+            conn.commit()
+            cursor.execute('DROP TABLE tb_entrevistas')
+            conn.commit()
+            
+            wb = pd.ExcelFile(file + '.xlsx')            
+
+            for sheet in wb.sheet_names:
+                if sheet == 'tb_assistidos':               
+                    df = pd.read_excel(file + '.xlsx', sheet_name=sheet, converters={'id_assistido': int, 'Nome':str, 'Data_de_nascimento': str, 'Telefone_1': str, 'Telefone_2': str, 'Genero': str, 'Estado_civil': str, 'Ocupacao': str, 'Reside_com': str, 'Endereco': str, 'Bairro': str, 'Numero': str, 'Cidade': str, 'Estado': str, 'Toma_sedativos': str, 'Tratamento_medico': str, 'Dorme_bem': str, 'Vicios': str, 'Sonhos': str, 'Trabalho': str, 'Familia': str, 'Alimentacao': str, 'Info_para_DEPOE': str, 'Ultimo_tratamento': str, 'Cursos': str, 'Encaminhamento': str, 'Tratamentos': str, 'Orientacao_espiritual': str})
+                    df.to_sql(sheet, conn, index=False)
+                else:
+                    df = pd.read_excel(file + '.xlsx', sheet_name=sheet, converters={'id_entrevista': int, 'id_assistido': int, 'Entrevistador': str, 'Tratamento': str, 'Entrevista': str})                    
+                    df.to_sql(sheet, conn, index=False)              
+            conn.commit()
+            
+            root = tkinter.Tk()
+            root.withdraw()
+            messagebox.showinfo('SUCESSO', 'Dados importados e substituidos com sucesso!\nSaindo do gerenciador de backups...')        
+            tkinter.Tk().destroy()
+            
+            db.close_connection(conn)
+        except sql.Error as e:
+            print(e)   
    
    
    

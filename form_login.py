@@ -8,7 +8,7 @@ from dao_assisted import DataAcessAssisted
 from dao_interview import DataAcessInterview
 
 dao_user = DataAcessUser()
-dao_assited = DataAcessAssisted()
+dao_assisted = DataAcessAssisted()
 dao_interview = DataAcessInterview()
 u = User()
 
@@ -178,9 +178,9 @@ class Ui_FormLogin(object):
 
 if __name__ == "__main__":
     import sys
-    dao_user.create_table_user()
-    dao_assited.create_table_assisted()
+    dao_assisted.create_table_assisted()
     dao_interview.create_table_interview()
+    dao_user.create_table_user()
     app = QtWidgets.QApplication(sys.argv)
     FormLogin = QtWidgets.QMainWindow()
     ui = Ui_FormLogin()

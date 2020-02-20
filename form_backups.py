@@ -1,8 +1,60 @@
 # -*- coding: utf-8 -*-
+import tkinter
 from PyQt5 import QtCore, QtGui, QtWidgets
+from tkinter import messagebox
+from dao_assisted import DataAcessAssisted
+from dao_user import DataAcessUser
+from PyQt5.QtWidgets import QFileDialog
 
+dao_assisted = DataAcessAssisted()
+dao_user = DataAcessUser()
 
-class Ui_FormBackup(object):        
+class Ui_FormBackup(object):
+    def btn_execute_clicked(self):
+        user = self.txt_user.text().strip()
+        password = self.txt_password.text().strip()        
+        
+        if dao_user.count_user(user) < 1:
+            root = tkinter.Tk()
+            root.withdraw()
+            messagebox.showerror('ERRO', 'ERRO!!! O Usuário informado não existe.\nTente outro usuário')
+            tkinter.Tk().destroy()
+        else:            
+            if self.radio_export.isChecked():
+                if password == dao_user.select_user(user)[1]:
+                    dao_assisted.export_data()        
+                    FormBackup.close()
+                else:
+                    root = tkinter.Tk()
+                    root.withdraw()
+                    messagebox.showerror('ERRO', 'ERRO!!! A senha para o usuário <{}> está incorreta'.format(user))
+                    tkinter.Tk().destroy()                    
+            else:                             
+                if dao_user.select_user(user)[2] != 'ADMINISTRADOR':
+                    root = tkinter.Tk()
+                    root.withdraw()
+                    messagebox.showerror('ERRO', 'ERRO!!! Apenas usuários com categoria ADMINISTRADOR podem IMPORTAR dados.\nInsira um usuário com a categoria de <ADMINISTRADOR> e tente novamente.')
+                    tkinter.Tk().destroy()
+                else:
+                    dialog = QFileDialog()        
+                    file = dialog.getOpenFileName(dialog, 'Selecionar arquivo de backup', '', 'Arquivo EXCEL 2007-365 (BACKUP_*.xlsx)')    
+                    
+                    if password == dao_user.select_user(user)[1]:
+                        root = tkinter.Tk()
+                        root.withdraw()
+                        choice = messagebox.askquestion('ATENÇÃO', 'Ao confirmar esta ação, TODOS os dados salvos anteriormente serão substituidos.\nDeseja continuar?')
+                        tkinter.Tk().destroy()
+                        
+                        if choice == 'yes':
+                            dao_assisted.import_data(file[0])
+                            FormBackup.close()
+                    else:
+                        root = tkinter.Tk()
+                        root.withdraw()
+                        messagebox.showerror('ERRO', 'ERRO!!! A senha para o usuário <{}> está incorreta'.format(user))
+                        tkinter.Tk().destroy()                                                                                         
+    
+    
     def setupUi(self, FormBackup):
         FormBackup.setObjectName("FormBackup")
         FormBackup.resize(500, 405)
@@ -24,9 +76,12 @@ class Ui_FormBackup(object):
         self.radio_export = QtWidgets.QRadioButton(self.groupBox)
         self.radio_export.setGeometry(QtCore.QRect(36, 60, 171, 22))
         self.radio_export.setObjectName("radio_export")
+        self.radio_export.setEnabled(False)
         self.radio_import = QtWidgets.QRadioButton(self.groupBox)
         self.radio_import.setGeometry(QtCore.QRect(280, 60, 161, 22))
         self.radio_import.setObjectName("radio_import")
+        self.radio_import.setEnabled(False)
+        self.radio_import.toggle()
         self.groupBox_2 = QtWidgets.QGroupBox(self.centralwidget)
         self.groupBox_2.setGeometry(QtCore.QRect(10, 140, 481, 211))
         font = QtGui.QFont()
@@ -80,8 +135,16 @@ class Ui_FormBackup(object):
         icon2.addPixmap(QtGui.QPixmap("images/database_go.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
         self.btn_execute.setIcon(icon2)
         self.btn_execute.setObjectName("btn_execute")
-        FormBackup.setCentralWidget(self.centralwidget)
+        self.btn_execute.clicked.connect(self.btn_execute_clicked)
+        FormBackup.setCentralWidget(self.centralwidget)    
 
+        if dao_assisted.id_gen_assisted() - 1 < 1:
+            self.radio_export.setEnabled(False)
+            self.radio_import.setEnabled(True)
+        else:
+            self.radio_export.setEnabled(True)
+            self.radio_import.setEnabled(True)             
+        
         self.retranslateUi(FormBackup)
         QtCore.QMetaObject.connectSlotsByName(FormBackup)
 
@@ -103,5 +166,5 @@ if __name__ == "__main__":
     FormBackup = QtWidgets.QMainWindow()
     ui = Ui_FormBackup()
     ui.setupUi(FormBackup)
-    FormBackup.show()
+    FormBackup.show()    
     sys.exit(app.exec_())

@@ -319,8 +319,8 @@ class Ui_FormSignUp(object):
         self.lbl_strength.setText(_translate("FormSignUp", "FORÇA DA SENHA:"))
         self.label_6.setText(_translate("FormSignUp", "CONFIRMAR SENHA"))
         self.label_7.setText(_translate("FormSignUp", "CATEGORIA"))
-        self.cmb_category.setItemText(0, _translate("FormSignUp", "Comum"))
-        self.cmb_category.setItemText(1, _translate("FormSignUp", "Administrador"))
+        self.cmb_category.setItemText(0, _translate("FormSignUp", "COMUM"))
+        self.cmb_category.setItemText(1, _translate("FormSignUp", "ADMINISTRADOR"))
         self.btn_signup.setText(_translate("FormSignUp", "CADASTRAR USUÁRIO"))
 
 

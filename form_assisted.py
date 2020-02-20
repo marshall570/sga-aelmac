@@ -201,8 +201,7 @@ class Ui_FormFicha(object):
         self.txt_number.setText(a.number)
         self.txt_city.setText(a.city)
         self.cmb_state.setCurrentText(a.state)                        
-        
-        
+                        
         if a.sedatives == 'Não':
             self.radio_sedative_no.toggle()
         else:
@@ -660,8 +659,8 @@ class Ui_FormFicha(object):
         a.phone2 = self.txt_phone2.text().strip() if len(self.txt_phone2.text().strip()) >= 14 else ''
         a.gender = self.cmb_gender.currentText()
         a.civil_state = self.cmb_civil_state.currentText()
-        a.ocupation = self.txt_ocupation.text().strip()
-        a.lives_with = self.txt_lives_with.text().strip()
+        a.ocupation = self.txt_ocupation.text().strip().upper()
+        a.lives_with = self.txt_lives_with.text().strip().upper()
         a.address = self.shorten_places(self.txt_address.text().strip().upper())
         a.neighbourhood = self.shorten_places(self.txt_neighbourhood.text().strip().upper())
         a.number = self.txt_number.text().strip().upper()
@@ -1022,7 +1021,7 @@ class Ui_FormFicha(object):
         if dao_assisted.id_gen_assisted() - 1 <= 0:
             self.empty_form()
         else:
-            self.btn_last_clicked()   
+            self.fill_form()
       
     def btn_save_clicked(self):
         if not self.test_mandatory_fields():
@@ -2486,7 +2485,7 @@ class Ui_FormFicha(object):
         font.setBold(False)
         font.setWeight(50)
         self.txt_index.setFont(font)
-        self.txt_index.setObjectName("txt_index")
+        self.txt_index.setObjectName("txt_index")        
         self.btn_search_index = QtWidgets.QPushButton(self.groupBox_2)
         self.btn_search_index.setGeometry(QtCore.QRect(340, 40, 131, 32))
         font = QtGui.QFont()

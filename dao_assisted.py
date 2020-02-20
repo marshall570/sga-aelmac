@@ -197,9 +197,60 @@ class DataAcessAssisted:
             db.close_connection(conn)
                
    
+    def count_custom_search(self, custom_string):
+        try:
+            conn = db.create_connection()
+            cursor = conn.cursor()
+            rs = cursor.execute(custom_string).fetchone()[0]                                            
+            return rs
+        except sql.Error as e:
+            print(e)
+        finally:
+            db.close_connection(conn, cursor)        
+
+
+    def custom_search(self, custom_string):
+        try:
+            conn = db.create_connection()
+            cursor = conn.cursor()
+            rs = cursor.execute(custom_string).fetchall()                                                
+            return rs
+        except sql.Error as e:
+            print(e)
+        finally:
+            db.close_connection(conn, cursor)        
    
    
-   
+    def gen_custom_csv(self, custom_string, selected_filter):
+        try:            
+            today = datetime.datetime.now().strftime("%d-%m-%y")            
+            
+            
+            if platform.system() == 'Linux':
+                if not os.path.exists(os.path.expanduser("~") + '/Documentos/GERENCIAMENTO_DE_ASSISTIDOS_AELMAC/RELATORIOS/'):
+                    os.mkdir(os.path.expanduser("~") + '/Documentos/GERENCIAMENTO_DE_ASSISTIDOS_AELMAC/RELATORIOS/')
+            else:
+                if not os.path.isdir(os.path.expanduser("~") + '\\Documents\\Pedidos_AELMAC\\EXCEL'):
+                    os.mkdir(os.path.expanduser("~") + '\\Documents\\Pedidos_AELMAC\\EXCEL')
+
+            conn = db.create_connection()
+            db_df = pd.read_sql_query(custom_string, conn)
+
+            if platform.system() == 'Linux':
+                db_df.to_csv(os.path.expanduser("~") + '/Documentos/GERENCIAMENTO_DE_ASSISTIDOS_AELMAC/RELATORIOS/FILTRAGEM_POR_' + selected_filter.upper() + '_' + today + '.csv', index=False)
+            else:
+                db_df.to_csv(os.path.expanduser("~") + '\\Documents\\Pedidos_AELMAC\\EXCEL\\Pedidos_EXCEL_' + selected_filter.upper() + '_' + today + '.csv', index=False)
+
+            
+            root = tkinter.Tk()
+            root.withdraw()
+            messagebox.showinfo('SUCESSO', 'Relatório para EXCEL gerado com sucesso!')        
+            tkinter.Tk().destroy()
+            
+            db.close_connection(conn)
+        except sql.Error as e:
+            print(e)
+        
    
    
    

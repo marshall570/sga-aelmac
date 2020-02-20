@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
 import tkinter
 from PyQt5 import QtCore, QtGui, QtWidgets
+from tkinter import messagebox
 from dto_user import User
 from dto_assisted import Assisted
 from dto_interview import Interview
-from tkinter import messagebox
 from dao_assisted import DataAcessAssisted
 from dao_interview import DataAcessInterview
 from time import sleep
@@ -925,8 +925,8 @@ class Ui_FormFicha(object):
             self.model.appendRow(row)     
 
     def clear_table_view(self):
-        # query_result = dao_interview.select_interview()        
         self.model.removeRows(0, self.model.rowCount())
+    
     
     ####################################################
     # BUTTONS METHODS    
@@ -1204,7 +1204,9 @@ class Ui_FormFicha(object):
         self.txt_interview.setPlainText(values[3])                            
     
 
-
+    ####################################################
+    # QT DESIGN METHODS    
+    ####################################################
     def setupUi(self, FormFicha):
         FormFicha.setObjectName("FormFicha")
         FormFicha.resize(897, 650)
@@ -2588,7 +2590,7 @@ class Ui_FormFicha(object):
         self.txt_date.setInputMask(_translate("FormFicha", "##/##/####"))
         self.label_6.setText(_translate("FormFicha", "TELEFONE (CELULAR)"))
         self.txt_phone1.setInputMask(_translate("FormFicha", "(##) #####-####"))
-        self.txt_phone2.setInputMask(_translate("FormFicha", "(##) #####-####"))
+        self.txt_phone2.setInputMask(_translate("FormFicha", "(##) ####-####"))
         self.label_7.setText(_translate("FormFicha", "TELEFONE (RESIDENCIAL)"))
         self.label_8.setText(_translate("FormFicha", "GÊNERO"))
         self.cmb_gender.setItemText(0, _translate("FormFicha", "MASCULINO"))

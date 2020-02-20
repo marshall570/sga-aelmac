@@ -2,7 +2,7 @@
 from PyQt5 import QtCore, QtGui, QtWidgets
 
 
-class Ui_FormBackup(object):
+class Ui_FormBackup(object):        
     def setupUi(self, FormBackup):
         FormBackup.setObjectName("FormBackup")
         FormBackup.resize(500, 405)

@@ -50,13 +50,10 @@ class Ui_FormLogin(object):
                     messagebox.showerror('ERRO', 'Senha incorreta para o usuário <{}>'.format(u.user))
                     tkinter.Tk().destroy()
                 else:
-                    from form_assisted import Ui_FormFicha
-                    root = tkinter.Tk()
-                    root.withdraw()
-                    messagebox.showinfo('BEM-VINDO', 'Login efetuado com sucesso!')
-                    tkinter.Tk().destroy()
+                    from form_assisted import Ui_FormFicha                    
                     dao_user.set_on(u)
-                    FormLogin.close()
+                    active_window = QtWidgets.QApplication.activeWindow()
+                    active_window.close()
                     self.FormFicha = QtWidgets.QMainWindow()
                     self.ui = Ui_FormFicha()
                     self.ui.setupUi(self.FormFicha)
@@ -64,7 +61,8 @@ class Ui_FormLogin(object):
 
     def btn_create_user_clicked(self):
         from form_sign_up import Ui_FormSignUp
-        FormLogin.close()
+        active_window = QtWidgets.QApplication.activeWindow()
+        active_window.close()     
         self.FormSignUp = QtWidgets.QMainWindow()
         self.ui = Ui_FormSignUp()
         self.ui.setupUi(self.FormSignUp)

@@ -48,6 +48,8 @@ class Ui_FormBackup(object):
                         
                     dao_assisted.export_data()
                     dao_user.register_changes(active_user[0], historic_message)
+                    active_window = QtWidgets.QApplication.activeWindow()
+                    active_window.close()
                 else:
                     root = tkinter.Tk()
                     root.withdraw()

@@ -1046,7 +1046,8 @@ class Ui_FormFicha(object):
             from form_login import Ui_FormLogin
             dao_user.set_off()
             dao_user.gen_historic()
-            FormFicha.close()
+            active_window = QtWidgets.QApplication.activeWindow()
+            active_window.close()       
             self.FormLogin = QtWidgets.QMainWindow()
             self.ui = Ui_FormLogin()
             self.ui.setupUi(self.FormLogin)
@@ -1121,20 +1122,20 @@ class Ui_FormFicha(object):
             
             if choice == 'yes':
                 historic_message = ''                
-                self.save_changes()
                 
                 if self.adding == True and self.editing == False:
                     self.get_values(a)
-                    historic_message = 'Adicionou o registro de <{}>'.format(self.txt_name.text().strip().upper())
+                    historic_message = 'ADICIONOU o registro de <{}>'.format(self.txt_name.text().strip().upper())
                     dao_assisted.insert_assisted(a)
                     dao_user.register_changes(u.name, historic_message)
                     self.adding = False      
                     self.btn_last_clicked()
                 elif self.editing == True and self.adding == False:
+                    self.save_changes()
                     self.get_values(a)
                     a.code = a.code - 1
                     dao_assisted.edit_assisted(a)
-                    historic_message = 'Editou no registro de <{}>: '.format(self.txt_name.text().strip().upper())
+                    historic_message = 'EDITOU no registro de <{}>: '.format(self.txt_name.text().strip().upper())
                     historic_message += self.check_changes()   
                     dao_user.register_changes(u.name, historic_message)
                     self.editing = False
@@ -1204,8 +1205,6 @@ class Ui_FormFicha(object):
         else:
             dao_assisted.print_register(a)
             
-                
-
     def radio_addictions_no_toggled(self):
         if self.check_alcohol.isChecked():
             self.check_alcohol.toggle()
@@ -1214,7 +1213,7 @@ class Ui_FormFicha(object):
         if self.check_cigarette.isChecked():
             self.check_cigarette.toggle()
         if self.check_drugs.isChecked():
-            self.check_drgus.toggle()
+            self.check_drugs.toggle()
         if self.check_sex.isChecked():
             self.check_sex.toggle()
         self.check_alcohol.setEnabled(False)
@@ -1231,7 +1230,7 @@ class Ui_FormFicha(object):
         if self.check_cigarette.isChecked():
             self.check_cigarette.toggle()
         if self.check_drugs.isChecked():
-            self.check_drgus.toggle()
+            self.check_drugs.toggle()
         if self.check_sex.isChecked():
             self.check_sex.toggle()
         self.check_alcohol.setEnabled(True)
@@ -1330,6 +1329,10 @@ class Ui_FormFicha(object):
     def setupUi(self, FormFicha):
         FormFicha.setObjectName("FormFicha")
         FormFicha.resize(897, 650)
+        win_icon = QtGui.QIcon()
+        win_icon.addPixmap(QtGui.QPixmap("images/aelmac_white.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        FormFicha.setWindowIcon(win_icon)
+        FormFicha.setWindowFlags(QtCore.Qt.FramelessWindowHint)  
         self.centralwidget = QtWidgets.QWidget(FormFicha)
         self.centralwidget.setObjectName("centralwidget")
         self.tabWidget = QtWidgets.QTabWidget(self.centralwidget)
@@ -2681,12 +2684,15 @@ class Ui_FormFicha(object):
         self.btn_report.clicked.connect(self.btn_reports_clicked)
         self.btn_log_out.clicked.connect(self.btn_log_out_clicked)
 
+        self.radio_addiction_yes.clicked.connect(self.radio_addictions_yes_toggled)
+        self.radio_addiction_no.clicked.connect(self.radio_addictions_no_toggled)
+
         self.btn_first.clicked.connect(self.btn_first_clicked)
         self.btn_previous.clicked.connect(self.btn_previous_clicked)        
         self.btn_next.clicked.connect(self.btn_next_clicked)
         self.btn_last.clicked.connect(self.btn_last_clicked)
 
-        self.get_user()
+        # self.get_user()
         
         self.enable_read_only()
         if dao_assisted.id_gen_assisted() - 1 != 0:

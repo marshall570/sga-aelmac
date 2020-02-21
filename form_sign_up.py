@@ -143,7 +143,8 @@ class Ui_FormSignUp(object):
                                 
                                 if choice == 'yes':
                                     from form_login import Ui_FormLogin
-                                    FormSignUp.close()
+                                    active_window = QtWidgets.QApplication.activeWindow()
+                                    active_window.close()
                                     self.FormLogin = QtWidgets.QMainWindow()
                                     self.ui = Ui_FormLogin()
                                     self.ui.setupUi(self.FormLogin)
@@ -156,7 +157,8 @@ class Ui_FormSignUp(object):
                                 
                             if choice == 'yes':
                                 from form_login import Ui_FormLogin
-                                FormSignUp.close()
+                                active_window = QtWidgets.QApplication.activeWindow()
+                                active_window.close()   
                                 self.FormLogin = QtWidgets.QMainWindow()
                                 self.ui = Ui_FormLogin()
                                 self.ui.setupUi(self.FormLogin)
@@ -323,6 +325,11 @@ class Ui_FormSignUp(object):
         self.cmb_category.setItemText(1, _translate("FormSignUp", "ADMINISTRADOR"))
         self.btn_signup.setText(_translate("FormSignUp", "CADASTRAR USUÁRIO"))
 
+    def show_gui(self):
+        FormSignUp = QtWidgets.QMainWindow()
+        ui = Ui_FormSignUp()
+        ui.setupUi(FormSignUp)
+        FormSignUp.show()
 
 if __name__ == "__main__":
     import sys

@@ -7,13 +7,16 @@ from dto_assisted import Assisted
 from dto_interview import Interview
 from dao_assisted import DataAcessAssisted
 from dao_interview import DataAcessInterview
-from time import sleep
+from dao_user import DataAcessUser
 
 # GLOBAL OBJECTS
 dao_assisted = DataAcessAssisted()
 dao_interview = DataAcessInterview()
+dao_user = DataAcessUser()
+
 a = Assisted()
 i = Interview()
+u = User()
 
 class Ui_FormFicha(object):
     ####################################################    
@@ -24,11 +27,19 @@ class Ui_FormFicha(object):
     adding = False
     editing = False
     writing_interview = False
+    old_values = []
     
     
     ####################################################    
     # PASSIVE METHODS
     ####################################################
+    def get_user(self):
+        result = dao_user.select_active_user()
+
+        u.name = result[0]
+        u.user = result[1]
+        u.category = result[2]
+    
     def empty_form(self):
         self.txt_name.setText('')
         self.txt_date.setText('')
@@ -184,7 +195,44 @@ class Ui_FormFicha(object):
         self.txt_info.setText('')                   
     
     def fill_form(self):
-        dao_assisted.select_assisted(a, self.index)
+        rs = dao_assisted.select_assisted(a, self.index)
+        new_values = []            
+        for value in rs:
+            if value == None:
+                item = ''
+            else:
+                item = value
+            new_values.append(item)
+                                                                            
+        a.code = new_values[0]
+        a.name = new_values[1]
+        a.date_of_birth = new_values[2]
+        a.phone1 = new_values[3]
+        a.phone2 = new_values[4]
+        a.gender = new_values[5]
+        a.civil_state = new_values[6]
+        a.ocupation = new_values[7]
+        a.lives_with = new_values[8]
+        a.address = new_values[9]
+        a.neighbourhood = new_values[10]
+        a.number = new_values[11]
+        a.city = new_values[12]
+        a.state = new_values[13]
+        a.sedatives = new_values[14]
+        a.medical_treatment = new_values[15]
+        a.sleep_well = new_values[16]
+        a.addictions = new_values[17]
+        a.dreams = new_values[18]
+        a.work = new_values[19]
+        a.family = new_values[20]
+        a.feeding = new_values[21]
+        a.traits = new_values[22]
+        a.latest_treatment = new_values[23]
+        a.courses = new_values[24]
+        a.fowarding = new_values[25]
+        a.treatment = new_values[26]
+        a.guidance = new_values[27]                
+        
         self.clear_table_view()
         self.fill_table_view()
         
@@ -623,7 +671,7 @@ class Ui_FormFicha(object):
         if total <= 1:
             self.disable_navigation()
         else:
-            if self.index == 1 and total != 1:
+            if self.index == 1 and total != 1:                
                 self.btn_first.setEnabled(False)
                 self.btn_previous.setEnabled(False)
                 self.btn_next.setEnabled(True)
@@ -926,7 +974,39 @@ class Ui_FormFicha(object):
     def clear_table_view(self):
         self.model.removeRows(0, self.model.rowCount())
     
+    def save_changes(self):                  
+        rs = dao_assisted.select_assisted(a, self.index)
+        for value in rs:
+            if value == None:
+                item = ''
+            else:
+                item = value
+            self.old_values.append(item)
     
+    def check_changes(self):
+        fields = ['Codigo', 'Nome, ', 'Data de Nascimento, ', 'Telefone (celular), ', 'Telefone (residencial), ', 'Gênero, ', 'Estado civil, ', 'Ocupação, ', 'Reside com, ', 'Endereço, ', 'Bairro, ', 'Número', 'Cidade', 'Estado', 'Toma sedativos, ', 'Tratamento médico, ', 'Dorme bem, ', 'Vícios, ', 'Sonhos, ', 'Trabalho, ', 'Família, ', 'Alimentação, ', 'Info para DEPOE, ', 'Ultimo tratamento, ', 'Cursos, ', 'Encaminhamento, ', 'Tratamentos, ', 'Orientação Espiritual']
+        new_values = []
+        
+        rs = dao_assisted.select_assisted(a, self.index)
+        for value in rs:
+            if value == None:
+                item = ''
+            else:
+                item = value
+            new_values.append(item)
+            
+        i = 1
+        text = ''
+        while i < len(fields):
+            if self.old_values[i] != new_values[i]:
+                text += fields[i]
+            i += 1
+            
+        if text.endswith(', '):
+            text = text[:-2]
+
+        return text
+                   
     ####################################################
     # BUTTONS METHODS    
     ####################################################
@@ -1009,6 +1089,7 @@ class Ui_FormFicha(object):
     
     def btn_cancel_clicked(self):
         self.enable_read_only()
+        self.enable_navigation()
         self.navigation_buttons()
         self.action_buttons()        
         
@@ -1036,18 +1117,26 @@ class Ui_FormFicha(object):
             tkinter.Tk().destroy()
             
             if choice == 'yes':
+                historic_message = ''                
+                self.save_changes()
+                
                 if self.adding:
                     self.get_values(a)
+                    historic_message = 'Adicionou o registro de <{}>'.format(self.txt_name.text().strip().upper())
                     dao_assisted.insert_assisted(a)
-                    self.btn_last_clicked()
-                    self.btn_cancel_clicked()
+                    dao_user.register_changes(u, historic_message)
                     self.adding = False      
+                    self.btn_last_clicked()
                 elif self.editing:
                     self.get_values(a)
                     dao_assisted.edit_assisted(a)
-                    self.btn_last_clicked()
-                    self.btn_cancel_clicked()
+                    historic_message = 'Editou no registro de <{}>: '.format(self.txt_name.text().strip().upper())
+                    historic_message += self.check_changes()
+                    dao_user.register_changes(u, historic_message)
                     self.editing = False
+                    self.fill_form()
+                
+                self.btn_cancel_clicked()
                                     
     def btn_delete_clicked(self):
         root = tkinter.Tk()
@@ -1185,6 +1274,8 @@ class Ui_FormFicha(object):
                 i.interview = self.txt_interview.toPlainText().strip().upper()
                 
                 dao_interview.insert_interview(i, a)
+                historic_message = 'Adicionou uma entrevista ao registro de <{}>'.format(self.txt_name.text().strip().upper())
+                dao_user.register_changes(u, historic_message)                
                 self.btn_new_interview_clicked()
                 self.btn_cancel_clicked()
                 self.tabWidget.setCurrentIndex(2)
@@ -1202,7 +1293,18 @@ class Ui_FormFicha(object):
         self.cmb_treatment.setCurrentText(values[2])
         self.txt_interview.setPlainText(values[3])                            
     
-
+    def btn_index_clicked(self):
+        if int(self.txt_index.text()) <= dao_assisted.id_gen_assisted() - 1:
+            self.index = int(self.txt_index.text())
+            self.fill_form()
+            self.navigation_buttons()
+        else:
+            root = tkinter.Tk()
+            root.withdraw()
+            messagebox.showerror('ERRO', 'Não foi possível encontrar um registro com o valor especificado.\nTente novamente com outro valor.')
+            tkinter.Tk().destroy()
+        
+        
     ####################################################
     # QT DESIGN METHODS    
     ####################################################
@@ -2477,7 +2579,9 @@ class Ui_FormFicha(object):
         font.setWeight(75)
         self.groupBox_2.setFont(font)
         self.groupBox_2.setObjectName("groupBox_2")
-        self.txt_index = QtWidgets.QLineEdit(self.groupBox_2)
+        self.txt_index = QtWidgets.QSpinBox(self.groupBox_2)
+        self.txt_index.setMaximum(2147483647)
+        self.txt_index.setMinimum(1)
         self.txt_index.setGeometry(QtCore.QRect(10, 40, 321, 32))
         font = QtGui.QFont()
         font.setFamily("Ubuntu")
@@ -2495,6 +2599,7 @@ class Ui_FormFicha(object):
         icon14.addPixmap(QtGui.QPixmap("images/zoom.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
         self.btn_search_index.setIcon(icon14)
         self.btn_search_index.setObjectName("btn_search_index")
+        self.btn_search_index.clicked.connect(self.btn_index_clicked)
         self.btn_first = QtWidgets.QPushButton(self.groupBox_2)
         self.btn_first.setGeometry(QtCore.QRect(10, 120, 115, 34))
         font = QtGui.QFont()
@@ -2562,6 +2667,7 @@ class Ui_FormFicha(object):
         self.btn_next.clicked.connect(self.btn_next_clicked)
         self.btn_last.clicked.connect(self.btn_last_clicked)
 
+        self.get_user()
         
         self.enable_read_only()
         if dao_assisted.id_gen_assisted() - 1 != 0:
@@ -2752,7 +2858,7 @@ class Ui_FormFicha(object):
         self.btn_report.setText(_translate("FormFicha", "RELATÓRIO"))
         self.btn_log_out.setText(_translate("FormFicha", "SAIR"))
         self.groupBox_2.setTitle(_translate("FormFicha", "NAVEGAÇÃO"))
-        self.txt_index.setText(_translate("FormFicha", "Digite um indice para ir até ele"))
+        # self.txt_index.setText(_translate("FormFicha", "Digite um indice para ir até ele"))
         self.btn_search_index.setText(_translate("FormFicha", "PESQUISAR"))
         self.btn_first.setText(_translate("FormFicha", "PRIMEIRO"))
         self.btn_previous.setText(_translate("FormFicha", "ANTERIOR"))

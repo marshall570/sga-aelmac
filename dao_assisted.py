@@ -83,44 +83,7 @@ class DataAcessAssisted:
             conn = db.create_connection()
             cursor = conn.cursor()
             rs = cursor.execute('SELECT * FROM tb_assistidos WHERE id_assistido = {}'.format(i)).fetchone()                                        
-
-            new_values = []            
-            for value in rs:
-                if value == None:
-                    item = ''
-                else:
-                    item = value
-                new_values.append(item)
-            
-                                                                     
-            a.code = new_values[0]
-            a.name = new_values[1]
-            a.date_of_birth = new_values[2]
-            a.phone1 = new_values[3]
-            a.phone2 = new_values[4]
-            a.gender = new_values[5]
-            a.civil_state = new_values[6]
-            a.ocupation = new_values[7]
-            a.lives_with = new_values[8]
-            a.address = new_values[9]
-            a.neighbourhood = new_values[10]
-            a.number = new_values[11]
-            a.city = new_values[12]
-            a.state = new_values[13]
-            a.sedatives = new_values[14]
-            a.medical_treatment = new_values[15]
-            a.sleep_well = new_values[16]
-            a.addictions = new_values[17]
-            a.dreams = new_values[18]
-            a.work = new_values[19]
-            a.family = new_values[20]
-            a.feeding = new_values[21]
-            a.traits = new_values[22]
-            a.latest_treatment = new_values[23]
-            a.courses = new_values[24]
-            a.fowarding = new_values[25]
-            a.treatment = new_values[26]
-            a.guidance = new_values[27]
+            return rs
         except sql.Error as e:
             print(e)
         finally:
@@ -338,42 +301,4 @@ class DataAcessAssisted:
             db.close_connection(conn)
         except sql.Error as e:
             print(e)   
-   
-   
-   
-   
-   
-   
-   
-   
-   
-               
-    def gen_csv(self):
-        try:
-            data = datetime.datetime.now().strftime("%d-%m-%y")
-            
-            if platform.system() == 'Linux':
-                if not os.path.exists(os.path.expanduser("~") + '/Documentos/Pedidos_AELMAC/EXCEL'):
-                    os.mkdir(os.path.expanduser("~") + '/Documentos/Pedidos_AELMAC/EXCEL')
-            else:
-                if not os.path.isdir(os.path.expanduser("~") + '\\Documents\\Pedidos_AELMAC\\EXCEL'):
-                    os.mkdir(os.path.expanduser("~") + '\\Documents\\Pedidos_AELMAC\\EXCEL')
-
-            conn = db.create_connection()
-            db_df = pd.read_sql_query("SELECT * FROM tb_pedidos", conn)
-
-            if platform.system() == 'Linux':
-                db_df.to_csv(os.path.expanduser("~") + '/Documentos/Pedidos_AELMAC/EXCEL/Pedidos_EXCEL_' + data +'.csv', index=False)
-            else:
-                db_df.to_csv(os.path.expanduser("~") + '\\Documents\\Pedidos_AELMAC\\EXCEL\\Pedidos_EXCEL_' + data +'.csv', index=False)
-
-            root = tkinter.Tk()
-            root.withdraw()
-            messagebox.showinfo('SUCESSO', 'Relatório para EXCEL gerado com sucesso!')        
-            tkinter.Tk().destroy()
-            
-            db.close_connection(conn)
-        except sql.Error as e:
-            print(e)
-        
-   
+      

@@ -10,6 +10,22 @@ dao_assisted = DataAcessAssisted()
 dao_user = DataAcessUser()
 
 class Ui_FormBackup(object):
+    password_visible = False
+
+    def btn_show_password_clicked(self):
+        if self.password_visible is True:
+            self.txt_password.setEchoMode(QtWidgets.QLineEdit.Password)
+            icon = QtGui.QIcon()
+            icon.addPixmap(QtGui.QPixmap("images/EnablePassword.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+            self.btn_show_password.setIcon(icon)
+            self.password_visible = False
+        else:
+            self.txt_password.setEchoMode(QtWidgets.QLineEdit.Normal)
+            icon = QtGui.QIcon()
+            icon.addPixmap(QtGui.QPixmap("images/DisablePassword.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+            self.btn_show_password.setIcon(icon)
+            self.password_visible = True    
+        
     def btn_execute_clicked(self):
         user = self.txt_user.text().strip()
         password = self.txt_password.text().strip()        
@@ -54,6 +70,7 @@ class Ui_FormBackup(object):
                         messagebox.showerror('ERRO', 'ERRO!!! A senha para o usuário <{}> está incorreta'.format(user))
                         tkinter.Tk().destroy()                                                                                         
     
+ 
     
     def setupUi(self, FormBackup):
         FormBackup.setObjectName("FormBackup")
@@ -123,6 +140,7 @@ class Ui_FormBackup(object):
         self.btn_show_password.setIcon(icon1)
         self.btn_show_password.setFlat(True)
         self.btn_show_password.setObjectName("btn_show_password")
+        self.btn_show_password.clicked.connect(self.btn_show_password_clicked)
         self.btn_execute = QtWidgets.QPushButton(self.centralwidget)
         self.btn_execute.setGeometry(QtCore.QRect(10, 360, 481, 34))
         font = QtGui.QFont()

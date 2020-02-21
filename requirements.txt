@@ -1,0 +1,7 @@
+requests
+xlrd
+xlsxwriter
+openpyxl
+pyqt5
+pandas
+fpdf

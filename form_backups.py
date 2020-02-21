@@ -2,12 +2,12 @@
 import tkinter
 from PyQt5 import QtCore, QtGui, QtWidgets
 from tkinter import messagebox
-from dao_assisted import DataAcessAssisted
-from dao_user import DataAcessUser
+from dao_assisted import DAOAssisted
+from dao_user import DAOUser
 from PyQt5.QtWidgets import QFileDialog
 
-dao_assisted = DataAcessAssisted()
-dao_user = DataAcessUser()
+dao_assisted = DAOAssisted()
+dao_user = DAOUser()
 
 class Ui_FormBackup(object):
     password_visible = False
@@ -35,11 +35,19 @@ class Ui_FormBackup(object):
             root.withdraw()
             messagebox.showerror('ERRO', 'ERRO!!! O Usuário informado não existe.\nTente outro usuário')
             tkinter.Tk().destroy()
-        else:            
+        else:       
+            historic_message = ''     
+            active_user = dao_user.select_active_user()
+            
             if self.radio_export.isChecked():
                 if password == dao_user.select_user(user)[1]:
-                    dao_assisted.export_data()        
-                    FormBackup.close()
+                    if user == active_user[1]:
+                        historic_message = 'EXPORTOU dados utilizando o próprio login'
+                    else:
+                        historic_message = f'EXPORTOU dados utilizando o login <{user}>'
+                        
+                    dao_assisted.export_data()
+                    dao_user.register_changes(active_user[0], historic_message)
                 else:
                     root = tkinter.Tk()
                     root.withdraw()
@@ -51,19 +59,25 @@ class Ui_FormBackup(object):
                     root.withdraw()
                     messagebox.showerror('ERRO', 'ERRO!!! Apenas usuários com categoria ADMINISTRADOR podem IMPORTAR dados.\nInsira um usuário com a categoria de <ADMINISTRADOR> e tente novamente.')
                     tkinter.Tk().destroy()
-                else:
-                    dialog = QFileDialog()        
-                    file = dialog.getOpenFileName(dialog, 'Selecionar arquivo de backup', '', 'Arquivo EXCEL 2007-365 (BACKUP_*.xlsx)')    
-                    
+                else:                    
                     if password == dao_user.select_user(user)[1]:
+                        dialog = QFileDialog()        
+                        file = dialog.getOpenFileName(dialog, 'Selecionar arquivo de backup', '', 'Arquivo EXCEL 2007-365 (BACKUP_*.xlsx)')    
+                     
                         root = tkinter.Tk()
                         root.withdraw()
                         choice = messagebox.askquestion('ATENÇÃO', 'Ao confirmar esta ação, TODOS os dados salvos anteriormente serão substituidos.\nDeseja continuar?')
                         tkinter.Tk().destroy()
                         
-                        if choice == 'yes':
+                        if choice == 'yes':                            
+                            if user == active_user[1]:
+                                historic_message = 'IMPORTOU dados utilizando o próprio login'
+                            else:
+                                historic_message = f'IMPORTOU dados utilizando o login de {active_user[0]}'                            
+
+                            dao_user.register_changes(active_user[0], historic_message)
                             dao_assisted.import_data(file[0])
-                            FormBackup.close()
+                            QtWidgets.QApplication.quit()
                     else:
                         root = tkinter.Tk()
                         root.withdraw()

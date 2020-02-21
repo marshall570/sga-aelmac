@@ -5,14 +5,14 @@ from tkinter import messagebox
 from dto_user import User
 from dto_assisted import Assisted
 from dto_interview import Interview
-from dao_assisted import DataAcessAssisted
-from dao_interview import DataAcessInterview
-from dao_user import DataAcessUser
+from dao_assisted import DAOAssisted
+from dao_interview import DAOInterview
+from dao_user import DAOUser
 
 # GLOBAL OBJECTS
-dao_assisted = DataAcessAssisted()
-dao_interview = DataAcessInterview()
-dao_user = DataAcessUser()
+dao_assisted = DAOAssisted()
+dao_interview = DAOInterview()
+dao_user = DAOUser()
 
 a = Assisted()
 i = Interview()
@@ -66,7 +66,7 @@ class Ui_FormFicha(object):
         if self.check_cigarette.isChecked():
             self.check_cigarette.toggle()
         if self.check_drugs.isChecked():
-            self.check_drgus.toggle()
+            self.check_drugs.toggle()
         if self.check_sex.isChecked():
             self.check_sex.toggle()
         self.check_alcohol.setEnabled(False)
@@ -195,6 +195,7 @@ class Ui_FormFicha(object):
         self.txt_info.setText('')                   
     
     def fill_form(self):
+        self.empty_form()
         rs = dao_assisted.select_assisted(a, self.index)
         new_values = []            
         for value in rs:
@@ -281,11 +282,11 @@ class Ui_FormFicha(object):
                 
                                    
         if a.dreams.startswith('SONHO'):
-            self.radio_dreams_yes.toggle()
-            self.txt_dreams.setText(a.dreams.replace('SONHO, ', ''))
+            self.radio_dreams_yes.toggle()            
+            self.txt_dreams.setText(a.dreams[7:])
         else:
             self.radio_dreams_no.toggle()        
-            self.txt_dreams.setText(a.dreams.replace('PESADELO, ', ''))
+            self.txt_dreams.setText(a.dreams[9:])
        
        
         self.txt_work.setText(a.work)
@@ -984,7 +985,7 @@ class Ui_FormFicha(object):
             self.old_values.append(item)
     
     def check_changes(self):
-        fields = ['Codigo', 'Nome, ', 'Data de Nascimento, ', 'Telefone (celular), ', 'Telefone (residencial), ', 'Gênero, ', 'Estado civil, ', 'Ocupação, ', 'Reside com, ', 'Endereço, ', 'Bairro, ', 'Número', 'Cidade', 'Estado', 'Toma sedativos, ', 'Tratamento médico, ', 'Dorme bem, ', 'Vícios, ', 'Sonhos, ', 'Trabalho, ', 'Família, ', 'Alimentação, ', 'Info para DEPOE, ', 'Ultimo tratamento, ', 'Cursos, ', 'Encaminhamento, ', 'Tratamentos, ', 'Orientação Espiritual']
+        fields = ['Codigo', 'Nome, ', 'Data de Nascimento, ', 'Telefone (celular), ', 'Telefone (residencial), ', 'Gênero, ', 'Estado civil, ', 'Ocupação, ', 'Reside com, ', 'Endereço, ', 'Bairro, ', 'Número, ', 'Cidade, ', 'Estado, ', 'Toma sedativos, ', 'Tratamento médico, ', 'Dorme bem, ', 'Vícios, ', 'Sonhos, ', 'Trabalho, ', 'Família, ', 'Alimentação, ', 'Info para DEPOE, ', 'Ultimo tratamento, ', 'Cursos, ', 'Encaminhamento, ', 'Tratamentos, ', 'Orientação Espiritual']
         new_values = []
         
         rs = dao_assisted.select_assisted(a, self.index)
@@ -993,13 +994,14 @@ class Ui_FormFicha(object):
                 item = ''
             else:
                 item = value
-            new_values.append(item)
+            new_values.append(item)               
             
         i = 1
         text = ''
         while i < len(fields):
-            if self.old_values[i] != new_values[i]:
-                text += fields[i]
+            if fields[i] != 'Ultimo tratamento, ':
+                if self.old_values[i] != new_values[i]:
+                    text += fields[i]
             i += 1
             
         if text.endswith(', '):
@@ -1042,7 +1044,8 @@ class Ui_FormFicha(object):
                 
         if choice == 'yes':
             from form_login import Ui_FormLogin
-            # dao.set_off()
+            dao_user.set_off()
+            dao_user.gen_historic()
             FormFicha.close()
             self.FormLogin = QtWidgets.QMainWindow()
             self.ui = Ui_FormLogin()
@@ -1120,19 +1123,20 @@ class Ui_FormFicha(object):
                 historic_message = ''                
                 self.save_changes()
                 
-                if self.adding:
+                if self.adding == True and self.editing == False:
                     self.get_values(a)
                     historic_message = 'Adicionou o registro de <{}>'.format(self.txt_name.text().strip().upper())
                     dao_assisted.insert_assisted(a)
-                    dao_user.register_changes(u, historic_message)
+                    dao_user.register_changes(u.name, historic_message)
                     self.adding = False      
                     self.btn_last_clicked()
-                elif self.editing:
+                elif self.editing == True and self.adding == False:
                     self.get_values(a)
+                    a.code = a.code - 1
                     dao_assisted.edit_assisted(a)
                     historic_message = 'Editou no registro de <{}>: '.format(self.txt_name.text().strip().upper())
-                    historic_message += self.check_changes()
-                    dao_user.register_changes(u, historic_message)
+                    historic_message += self.check_changes()   
+                    dao_user.register_changes(u.name, historic_message)
                     self.editing = False
                     self.fill_form()
                 
@@ -1146,6 +1150,8 @@ class Ui_FormFicha(object):
         
         if choice == 'yes':
             dao_assisted.delete_assisted(self.index)
+            historic_message = f'DELETOU o registro de <{a.name}>'
+            dao_user.register_changes(u.name, historic_message)
             if dao_assisted.id_gen_assisted() - 1 == 0:
                 self.empty_form()
                 self.action_buttons()
@@ -1185,7 +1191,20 @@ class Ui_FormFicha(object):
         self.btn_delete.setEnabled(False)
         
     def btn_print_clicked(self):
-        dao_assisted.print_register(a)                   
+        if dao_interview.count_interviews(a) > 2:
+            root = tkinter.Tk()
+            root.withdraw()
+            choice = messagebox.askquestion('IMPRESSÃO', 'Parece que esse registro possui três ou mais entrevistas.\nDeseja imprimir apenas as entrevistas mais recentes?')
+            tkinter.Tk().destroy()
+            
+            if choice == 'yes':
+                dao_interview.print_interviews(a)
+            else:
+                dao_assisted.print_register(a)
+        else:
+            dao_assisted.print_register(a)
+            
+                
 
     def radio_addictions_no_toggled(self):
         if self.check_alcohol.isChecked():
@@ -1271,7 +1290,7 @@ class Ui_FormFicha(object):
                 i.date = today
                 i.interviewer = self.txt_interviewer.text().strip().upper()
                 i.treatment = self.cmb_treatment.currentText()
-                i.interview = self.txt_interview.toPlainText().strip().upper()
+                i.interview = self.txt_interview.toPlainText().strip()
                 
                 dao_interview.insert_interview(i, a)
                 historic_message = 'Adicionou uma entrevista ao registro de <{}>'.format(self.txt_name.text().strip().upper())

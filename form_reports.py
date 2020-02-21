@@ -2,14 +2,13 @@
 import tkinter
 from PyQt5 import QtCore, QtGui, QtWidgets
 from tkinter import messagebox
-from dao_assisted import DataAcessAssisted
+from dao_assisted import DAOAssisted
 
-dao_assisted = DataAcessAssisted()
+dao_assisted = DAOAssisted()
 
 class Ui_FormReports(object):
-    selected_filter = 'Nome' 
+    selected_filter = 'Nome'
     custom_sql = ''   
-
    
     def cmb_filter_changed(self):
         self.model.removeRows(0, self.model.rowCount())                               

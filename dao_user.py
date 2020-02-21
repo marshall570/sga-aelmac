@@ -1,13 +1,14 @@
 # -*- coding: utf-8 -*-
 import sqlite3 as sql
+import pandas as pd
+import datetime
 import tkinter
 from tkinter import messagebox
 from database import Data
-import datetime
 
 db = Data()
 
-class DataAcessUser:
+class DAOUser:
     def create_table_user(self):
         try:
             table_sql = 'CREATE TABLE IF NOT EXISTS tb_usuarios (id_usuario INTEGER NOT NULL PRIMARY KEY, Nome TEXT, Usuario TEXT, Senha TEXT, Categoria TEXT, Status TEXT)'
@@ -83,7 +84,7 @@ class DataAcessUser:
 
     def insert_user(self, u):
         try:
-            sql_string = "INSERT INTO tb_usuarios VALUES ({}, '{}', '{}', '{}', '{}', OFF)".format(u.code, u.name, u.user, u.password, u.category)
+            sql_string = "INSERT INTO tb_usuarios VALUES ({}, '{}', '{}', '{}', '{}', 'OFF')".format(u.code, u.name, u.user, u.password, u.category)
 
             conn = db.create_connection()
             cursor = conn.cursor()
@@ -170,9 +171,9 @@ class DataAcessUser:
 
             conn = db.create_connection()
             cursor = conn.cursor()
-            rs = cursor.execute('SELECT COUNT(*) FROM tb_historico').fetchone()[0] + 1
+            rs = cursor.execute('SELECT id_alteracao FROM tb_historico ORDER BY id_alteracao DESC LIMIT 1').fetchone()[0] + 1
                         
-            sql_string = "INSERT INTO tb_historico VALUES ({}, '{}', '{}', '{}')".format(rs, now, u.name, message)
+            sql_string = "INSERT INTO tb_historico VALUES ({}, '{}', '{}', '{}')".format(rs, now, u, message)
             cursor.execute(sql_string)
             conn.commit()            
         except sql.Error as e:
@@ -180,5 +181,14 @@ class DataAcessUser:
         finally:
             db.close_connection(conn, cursor)
             
-            
+    
+    def gen_historic(self):
+        try:
+            conn = db.create_connection()
+            df = pd.read_sql_query('SELECT * FROM tb_historico', conn)
+            df.to_excel('Registro_de_alteracoes.xlsx', index=None)
+        except sql.Error as e:
+            print(e)
+        finally:
+            db.close_connection(conn)
     

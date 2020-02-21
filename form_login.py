@@ -3,13 +3,13 @@ import tkinter
 from PyQt5 import QtCore, QtGui, QtWidgets
 from dto_user import User
 from tkinter import messagebox
-from dao_user import DataAcessUser
-from dao_assisted import DataAcessAssisted
-from dao_interview import DataAcessInterview
+from dao_user import DAOUser
+from dao_assisted import DAOAssisted
+from dao_interview import DAOInterview
 
-dao_user = DataAcessUser()
-dao_assisted = DataAcessAssisted()
-dao_interview = DataAcessInterview()
+dao_user = DAOUser()
+dao_assisted = DAOAssisted()
+dao_interview = DAOInterview()
 u = User()
 
 class Ui_FormLogin(object):
@@ -180,6 +180,7 @@ class Ui_FormLogin(object):
 if __name__ == "__main__":
     import sys
     dao_assisted.create_table_assisted()
+    dao_assisted.create_files_directory()
     dao_interview.create_table_interview()
     dao_user.create_table_user()
     dao_user.create_table_changes()

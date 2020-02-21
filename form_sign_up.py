@@ -3,10 +3,10 @@ import tkinter
 from PyQt5 import QtCore, QtGui, QtWidgets
 from dto_user import User
 from tkinter import messagebox
-from dao_user import DataAcessUser
+from dao_user import DAOUser
 
 u = User()
-dao = DataAcessUser()
+dao = DAOUser()
 
 class Ui_FormSignUp(object):
     password_visible = False
@@ -68,7 +68,7 @@ class Ui_FormSignUp(object):
             self.lbl_strength.setText('FORÇA DA SENHA: MUITO FRACA')
         elif self.strength <= 4:
             self.lbl_strength.setText('FORÇA DA SENHA: FRACA')
-        elif self.strength <= 6:
+        elif self.strength <= 5:
             self.lbl_strength.setText('FORÇA DA SENHA: ACEITÁVEL')
         elif self.strength <= 8:
             self.lbl_strength.setText('FORÇA DA SENHA: FORTE')
@@ -108,7 +108,7 @@ class Ui_FormSignUp(object):
                 u.name = self.txt_name.text().strip().title()
                 u.user = self.txt_user.text().strip()
                 u.password = self.txt_password.text().strip()
-                u.category = str(self.cmb_category.currentText())
+                u.category = self.cmb_category.currentText()
                 if dao.register_count_user(u) > 0:
                     root = tkinter.Tk()
                     root.withdraw()
@@ -121,12 +121,12 @@ class Ui_FormSignUp(object):
                         messagebox.showerror('AÇÃO NÃO PERMITIDA', 'A senha inserida é MUITO FRACA, insira uma senha mais forte para efetuar o cadastro.')
                         tkinter.Tk().destroy()
                     else:
-                        if self.strength < 5 and str(self.cmb_category.currentText()) == 'Administrador':            
+                        if self.lbl_strength.text().endswith('FRACA') and self.cmb_category.currentText() == 'ADMINISTRADOR':            
                             root = tkinter.Tk()
                             root.withdraw()
                             messagebox.showerror('AÇÃO NÃO PERMITIDA', 'Usuário com categoria ADMINISTRADOR necessita senha com força ACEITÁVEL ou maior')
                             tkinter.Tk().destroy()
-                        elif self.strength < 5 and str(self.cmb_category.currentText()) != 'Administrador':
+                        elif self.lbl_strength.text().endswith('FRACA') < 5 and self.cmb_category.currentText() != 'ADMINISTRADOR':
                             root = tkinter.Tk()
                             root.withdraw()
                             choice = messagebox.askquestion('ATENÇÃO', 'Deseja criar usuário com uma senha FRACA?')

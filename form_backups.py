@@ -27,6 +27,7 @@ class Ui_FormBackup(object):
             self.password_visible = True    
         
     def btn_execute_clicked(self):
+        this_window = QtWidgets.QApplication.activeWindow()        
         user = self.txt_user.text().strip()
         password = self.txt_password.text().strip()        
         
@@ -48,8 +49,7 @@ class Ui_FormBackup(object):
                         
                     dao_assisted.export_data()
                     dao_user.register_changes(active_user[0], historic_message)
-                    active_window = QtWidgets.QApplication.activeWindow()
-                    active_window.close()
+                    this_window.close()
                 else:
                     root = tkinter.Tk()
                     root.withdraw()
@@ -78,6 +78,7 @@ class Ui_FormBackup(object):
                                 historic_message = f'IMPORTOU dados utilizando o login de {active_user[0]}'                            
 
                             dao_user.register_changes(active_user[0], historic_message)
+                            dao_user.gen_historic()
                             dao_assisted.import_data(file[0])
                             QtWidgets.QApplication.quit()
                     else:

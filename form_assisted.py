@@ -1037,6 +1037,8 @@ class Ui_FormFicha(object):
         self.navigation_buttons()    
     
     def btn_log_out_clicked(self):
+        this_window = QtWidgets.QApplication.activeWindow()
+        
         root = tkinter.Tk()
         root.withdraw()
         choice = messagebox.askquestion('SAIR DO SISTEMA', 'Deseja sair do sistema?')
@@ -1046,8 +1048,7 @@ class Ui_FormFicha(object):
             from form_login import Ui_FormLogin
             dao_user.set_off()
             dao_user.gen_historic()
-            active_window = QtWidgets.QApplication.activeWindow()
-            active_window.close()       
+            this_window.close()       
             self.FormLogin = QtWidgets.QMainWindow()
             self.ui = Ui_FormLogin()
             self.ui.setupUi(self.FormLogin)
@@ -1292,8 +1293,8 @@ class Ui_FormFicha(object):
                 i.interview = self.txt_interview.toPlainText().strip()
                 
                 dao_interview.insert_interview(i, a)
-                historic_message = 'Adicionou uma entrevista ao registro de <{}>'.format(self.txt_name.text().strip().upper())
-                dao_user.register_changes(u, historic_message)                
+                historic_message = 'Adicionou uma ENTREVISTA ao registro de <{}>'.format(self.txt_name.text().strip().upper())
+                dao_user.register_changes(u.name, historic_message)                
                 self.btn_new_interview_clicked()
                 self.btn_cancel_clicked()
                 self.tabWidget.setCurrentIndex(2)

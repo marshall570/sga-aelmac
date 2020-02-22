@@ -93,6 +93,7 @@ class Ui_FormSignUp(object):
             return True          
         
     def btn_signup_clicked(self):
+        this_window = QtWidgets.QApplication.activeWindow()
         if len(self.txt_password.text()) < 1:
             root = tkinter.Tk()
             root.withdraw()
@@ -142,9 +143,8 @@ class Ui_FormSignUp(object):
                                 tkinter.Tk().destroy()
                                 
                                 if choice == 'yes':
-                                    from form_login import Ui_FormLogin
-                                    active_window = QtWidgets.QApplication.activeWindow()
-                                    active_window.close()
+                                    from form_login import Ui_FormLogin                                    
+                                    this_window.close()
                                     self.FormLogin = QtWidgets.QMainWindow()
                                     self.ui = Ui_FormLogin()
                                     self.ui.setupUi(self.FormLogin)
@@ -157,8 +157,7 @@ class Ui_FormSignUp(object):
                                 
                             if choice == 'yes':
                                 from form_login import Ui_FormLogin
-                                active_window = QtWidgets.QApplication.activeWindow()
-                                active_window.close()   
+                                this_window.close()
                                 self.FormLogin = QtWidgets.QMainWindow()
                                 self.ui = Ui_FormLogin()
                                 self.ui.setupUi(self.FormLogin)

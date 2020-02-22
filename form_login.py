@@ -30,6 +30,7 @@ class Ui_FormLogin(object):
             self.password_visible = True
 
     def btn_signin_clicked(self):
+        this_window = QtWidgets.QApplication.activeWindow()        
         u.user = self.txt_user.text().strip()
         if dao_user.register_count_user(u) < 1:
             root = tkinter.Tk()
@@ -52,17 +53,16 @@ class Ui_FormLogin(object):
                 else:
                     from form_assisted import Ui_FormFicha                    
                     dao_user.set_on(u)
-                    active_window = QtWidgets.QApplication.activeWindow()
-                    active_window.close()
+                    this_window.close()
                     self.FormFicha = QtWidgets.QMainWindow()
                     self.ui = Ui_FormFicha()
                     self.ui.setupUi(self.FormFicha)
                     self.FormFicha.show()
 
     def btn_create_user_clicked(self):
+        this_window = QtWidgets.QApplication.activeWindow()        
         from form_sign_up import Ui_FormSignUp
-        active_window = QtWidgets.QApplication.activeWindow()
-        active_window.close()     
+        this_window.close()     
         self.FormSignUp = QtWidgets.QMainWindow()
         self.ui = Ui_FormSignUp()
         self.ui.setupUi(self.FormSignUp)

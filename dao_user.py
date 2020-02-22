@@ -171,7 +171,7 @@ class DAOUser:
 
             conn = db.create_connection()
             cursor = conn.cursor()
-            rs = cursor.execute('SELECT id_alteracao FROM tb_historico ORDER BY id_alteracao DESC LIMIT 1').fetchone()[0] + 1
+            rs = cursor.execute('SELECT COUNT(*) FROM tb_historico').fetchone()[0] + 1
                         
             sql_string = "INSERT INTO tb_historico VALUES ({}, '{}', '{}', '{}')".format(rs, now, u, message)
             cursor.execute(sql_string)

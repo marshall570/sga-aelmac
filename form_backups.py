@@ -63,24 +63,34 @@ class Ui_FormBackup(object):
                     tkinter.Tk().destroy()
                 else:                    
                     if password == dao_user.select_user(user)[1]:
+                        import platform
+                        import os
+                        path = ''
+                                                
+                        if platform.system() == 'Linux':
+                            path = os.path.expanduser("~") + '/Documentos/GERENCIAMENTO_DE_ASSISTIDOS_AELMAC/BACKUPS/'
+                        else:
+                            path = os.path.expanduser("~") + '\\Documents\\GERENCIAMENTO_DE_ASSISTIDOS_AELMAC\\BACKUPS\\'
+                            
                         dialog = QFileDialog()        
-                        file = dialog.getOpenFileName(dialog, 'Selecionar arquivo de backup', '', 'Arquivo de Banco de Dados (*.db)')    
-                     
-                        root = tkinter.Tk()
-                        root.withdraw()
-                        choice = messagebox.askquestion('ATENÇÃO', 'Ao confirmar esta ação, TODOS os dados salvos anteriormente serão substituidos.\nDeseja continuar?')
-                        tkinter.Tk().destroy()
-                        
-                        if choice == 'yes':                            
-                            if user == active_user[1]:
-                                historic_message = 'IMPORTOU dados utilizando o próprio login'
-                            else:
-                                historic_message = f'IMPORTOU dados utilizando o login de {active_user[0]}'                            
+                        file = dialog.getOpenFileName(dialog, 'Selecionar arquivo de backup', path, 'Arquivo de Banco de Dados (*.db)')    
+                                                
+                        if file[0] != '':
+                            root = tkinter.Tk()
+                            root.withdraw()
+                            choice = messagebox.askquestion('ATENÇÃO', 'Ao confirmar esta ação, TODOS os dados salvos anteriormente serão substituidos.\nDeseja continuar?')
+                            tkinter.Tk().destroy()
+                            
+                            if choice == 'yes':                            
+                                if user == active_user[1]:
+                                    historic_message = 'IMPORTOU dados utilizando o próprio login'
+                                else:
+                                    historic_message = f'IMPORTOU dados utilizando o login de {active_user[0]}'                            
 
-                            dao_user.register_changes(active_user[0], historic_message)
-                            dao_user.gen_historic()
-                            dao_assisted.import_data(file[0])
-                            QtWidgets.QApplication.quit()
+                                dao_user.register_changes(active_user[0], historic_message)
+                                dao_user.gen_historic()
+                                dao_assisted.import_data(file[0])
+                                QtWidgets.QApplication.quit()
                     else:
                         root = tkinter.Tk()
                         root.withdraw()

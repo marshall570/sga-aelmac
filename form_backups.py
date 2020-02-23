@@ -64,7 +64,7 @@ class Ui_FormBackup(object):
                 else:                    
                     if password == dao_user.select_user(user)[1]:
                         dialog = QFileDialog()        
-                        file = dialog.getOpenFileName(dialog, 'Selecionar arquivo de backup', '', 'Arquivo EXCEL 2007-365 (BACKUP_*.xlsx)')    
+                        file = dialog.getOpenFileName(dialog, 'Selecionar arquivo de backup', '', 'Arquivo de Banco de Dados (*.db)')    
                      
                         root = tkinter.Tk()
                         root.withdraw()
@@ -172,7 +172,7 @@ class Ui_FormBackup(object):
         self.btn_execute.setObjectName("btn_execute")
         self.btn_execute.clicked.connect(self.btn_execute_clicked)
         FormBackup.setCentralWidget(self.centralwidget)    
-
+        
         if dao_assisted.id_gen_assisted() - 1 < 1:
             self.radio_export.setEnabled(False)
             self.radio_import.setEnabled(True)
@@ -196,7 +196,7 @@ class Ui_FormBackup(object):
 
 
 if __name__ == "__main__":
-    import sys
+    import sys    
     app = QtWidgets.QApplication(sys.argv)
     FormBackup = QtWidgets.QMainWindow()
     ui = Ui_FormBackup()

@@ -2,8 +2,8 @@
 import tkinter
 from PyQt5 import QtCore, QtGui, QtWidgets
 from dto_user import User
-from tkinter import messagebox
 from dao_user import DAOUser
+from tkinter import messagebox
 
 u = User()
 dao = DAOUser()
@@ -116,7 +116,7 @@ class Ui_FormSignUp(object):
                     messagebox.showerror('AÇÃO NÃO PERMITIDA', 'O usuário já está cadastrado no banco de dados. Tente outro nome de usuário.')
                     tkinter.Tk().destroy()
                 else:
-                    if self.lbl_strength.text().endswith == 'MUITO FRACA':
+                    if self.lbl_strength.text().endswith('MUITO FRACA'):
                         root = tkinter.Tk()
                         root.withdraw()
                         messagebox.showerror('AÇÃO NÃO PERMITIDA', 'A senha inserida é MUITO FRACA, insira uma senha mais forte para efetuar o cadastro.')
@@ -127,7 +127,7 @@ class Ui_FormSignUp(object):
                             root.withdraw()
                             messagebox.showerror('AÇÃO NÃO PERMITIDA', 'Usuário com categoria ADMINISTRADOR necessita senha com força ACEITÁVEL ou maior')
                             tkinter.Tk().destroy()
-                        elif self.lbl_strength.text().endswith('FRACA') < 5 and self.cmb_category.currentText() != 'ADMINISTRADOR':
+                        elif self.lbl_strength.text().endswith('FRACA') and self.cmb_category.currentText() != 'ADMINISTRADOR':
                             root = tkinter.Tk()
                             root.withdraw()
                             choice = messagebox.askquestion('ATENÇÃO', 'Deseja criar usuário com uma senha FRACA?')
@@ -317,18 +317,13 @@ class Ui_FormSignUp(object):
         self.label_2.setText(_translate("FormSignUp", "NOME"))
         self.label_3.setText(_translate("FormSignUp", "USUÁRIO"))
         self.label_4.setText(_translate("FormSignUp", "SENHA"))
-        self.lbl_strength.setText(_translate("FormSignUp", "FORÇA DA SENHA:"))
+        self.lbl_strength.setText(_translate("FormSignUp", "FORÇA DA SENHA: MUITO FRACA"))
         self.label_6.setText(_translate("FormSignUp", "CONFIRMAR SENHA"))
         self.label_7.setText(_translate("FormSignUp", "CATEGORIA"))
         self.cmb_category.setItemText(0, _translate("FormSignUp", "COMUM"))
         self.cmb_category.setItemText(1, _translate("FormSignUp", "ADMINISTRADOR"))
         self.btn_signup.setText(_translate("FormSignUp", "CADASTRAR USUÁRIO"))
 
-    def show_gui(self):
-        FormSignUp = QtWidgets.QMainWindow()
-        ui = Ui_FormSignUp()
-        ui.setupUi(FormSignUp)
-        FormSignUp.show()
 
 if __name__ == "__main__":
     import sys

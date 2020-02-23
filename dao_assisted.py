@@ -9,6 +9,7 @@ import fpdf
 from tkinter import messagebox
 from database import Data
 from dao_interview import DAOInterview
+from shutil import copyfile
 
 db = Data()
 dao_interview = DAOInterview()
@@ -245,82 +246,110 @@ class DAOAssisted:
             db.close_connection(conn)
             
             
+    # def export_data(self):
+    #     try:            
+    #         today = datetime.datetime.now().strftime("%d-%m-%y")            
+            
+    #         self.create_files_directory()
+
+    #         conn = db.create_connection()
+    #         db_df_assisted = pd.read_sql_query('SELECT * FROM tb_assistidos', conn)
+    #         db_df_interview = pd.read_sql_query('SELECT * FROM tb_entrevistas', conn)
+
+    #         if platform.system() == 'Linux':
+    #             writer = pd.ExcelWriter(os.path.expanduser("~") + '/Documentos/GERENCIAMENTO_DE_ASSISTIDOS_AELMAC/BACKUPS/BACKUP' + '_' + today + '.xlsx', engine='xlsxwriter')                
+    #             db_df_assisted.to_excel(writer, sheet_name = 'tb_assistidos', index = None, header = True)
+    #             db_df_interview.to_excel(writer, sheet_name = 'tb_entrevistas', index = None, header = True)
+                
+    #             workbook = writer.book
+    #             worksheet = writer.sheets['tb_assistidos']
+                
+    #             format_text = workbook.add_format()
+    #             format_text.set_num_format('@')
+    #             worksheet.set_column('B:AB', None, format_text)
+                
+    #             writer.save()
+    #         else:
+    #             writer = pd.ExcelWriter(os.path.expanduser("~") + '\\Documents\\GERENCIAMENTO_DE_ASSISTIDOS_AELMAC\\BACKUPS\\BACKUP' + '_' + today + '.xlsx', engine='xlsxwriter')                
+    #             db_df_assisted.to_excel(writer, sheet_name = 'tb_assistidos', index = None, header = True)
+    #             db_df_interview.to_excel(writer, sheet_name = 'tb_entrevistas', index = None, header = True)
+                
+    #             workbook = writer.book
+    #             worksheet = writer.sheets['tb_assistidos']
+                
+    #             format_text = workbook.add_format()
+    #             format_text.set_num_format('@')
+    #             worksheet.set_column('B:AB', None, format_text)
+                
+    #             writer.save()
+
+    #         root = tkinter.Tk()
+    #         root.withdraw()
+    #         messagebox.showinfo('SUCESSO', 'BACKUP do banco de dados gerado com sucesso!\nSaindo do gerenciador de backups...')        
+    #         tkinter.Tk().destroy()
+            
+    #     except sql.Error as e:
+    #         print(e)
+    #     finally:
+    #         db.close_connection(conn)
+    
+    
     def export_data(self):
-        try:            
-            today = datetime.datetime.now().strftime("%d-%m-%y")            
-            
-            self.create_files_directory()
-
-            conn = db.create_connection()
-            db_df_assisted = pd.read_sql_query('SELECT * FROM tb_assistidos', conn)
-            db_df_interview = pd.read_sql_query('SELECT * FROM tb_entrevistas', conn)
-
-            if platform.system() == 'Linux':
-                writer = pd.ExcelWriter(os.path.expanduser("~") + '/Documentos/GERENCIAMENTO_DE_ASSISTIDOS_AELMAC/BACKUPS/BACKUP' + '_' + today + '.xlsx', engine='xlsxwriter')                
-                db_df_assisted.to_excel(writer, sheet_name = 'tb_assistidos', index = None, header = True)
-                db_df_interview.to_excel(writer, sheet_name = 'tb_entrevistas', index = None, header = True)
-                
-                workbook = writer.book
-                worksheet = writer.sheets['tb_assistidos']
-                
-                format_text = workbook.add_format()
-                format_text.set_num_format('@')
-                worksheet.set_column('B:AB', None, format_text)
-                
-                writer.save()
-            else:
-                writer = pd.ExcelWriter(os.path.expanduser("~") + '\\Documents\\GERENCIAMENTO_DE_ASSISTIDOS_AELMAC\\BACKUPS\\BACKUP' + '_' + today + '.xlsx', engine='xlsxwriter')                
-                db_df_assisted.to_excel(writer, sheet_name = 'tb_assistidos', index = None, header = True)
-                db_df_interview.to_excel(writer, sheet_name = 'tb_entrevistas', index = None, header = True)
-                
-                workbook = writer.book
-                worksheet = writer.sheets['tb_assistidos']
-                
-                format_text = workbook.add_format()
-                format_text.set_num_format('@')
-                worksheet.set_column('B:AB', None, format_text)
-                
-                writer.save()
-
-            root = tkinter.Tk()
-            root.withdraw()
-            messagebox.showinfo('SUCESSO', 'BACKUP do banco de dados gerado com sucesso!\nSaindo do gerenciador de backups...')        
-            tkinter.Tk().destroy()
-            
-        except sql.Error as e:
-            print(e)
-        finally:
-            db.close_connection(conn)
+        today = datetime.datetime.now().strftime("%d-%m-%y")            
         
-   
-    def import_data(self, file):
-        try:            
-            conn = db.create_connection()
-            cursor = conn.cursor()
-            cursor.execute('DROP TABLE tb_assistidos')
-            conn.commit()
-            cursor.execute('DROP TABLE tb_entrevistas')
-            conn.commit()
-            
-            wb = pd.ExcelFile(file)            
+        self.create_files_directory()            
 
-            for sheet in wb.sheet_names:
-                if sheet == 'tb_assistidos':               
-                    df = pd.read_excel(file, sheet_name=sheet, converters={'id_assistido': int, 'Nome':str, 'Data_de_nascimento': str, 'Telefone_1': str, 'Telefone_2': str, 'Genero': str, 'Estado_civil': str, 'Ocupacao': str, 'Reside_com': str, 'Endereco': str, 'Bairro': str, 'Numero': str, 'Cidade': str, 'Estado': str, 'Toma_sedativos': str, 'Tratamento_medico': str, 'Dorme_bem': str, 'Vicios': str, 'Sonhos': str, 'Trabalho': str, 'Familia': str, 'Alimentacao': str, 'Info_para_DEPOE': str, 'Ultimo_tratamento': str, 'Cursos': str, 'Encaminhamento': str, 'Tratamentos': str, 'Orientacao_espiritual': str})
-                    df.to_sql(sheet, conn, index=False)
-                else:
-                    df = pd.read_excel(file, sheet_name=sheet, converters={'id_entrevista': int, 'id_assistido': int, 'Entrevistador': str, 'Tratamento': str, 'Entrevista': str})                    
-                    df.to_sql(sheet, conn, index=False)              
-            conn.commit()
+        if platform.system() == 'Linux':
+            copyfile('sga_database.db', os.path.expanduser("~") + '/Documentos/GERENCIAMENTO_DE_ASSISTIDOS_AELMAC/BACKUPS/BACKUP' + '_' + today + '.db')
+        else:
+            copyfile('sga_database.db', os.path.expanduser("~") + '\\Documents\\GERENCIAMENTO_DE_ASSISTIDOS_AELMAC\\BACKUPS\\BACKUP' + '_' + today + '.db')
+
+
+        root = tkinter.Tk()
+        root.withdraw()
+        messagebox.showinfo('SUCESSO', 'BACKUP do banco de dados gerado com sucesso!\nSaindo do gerenciador de backups...')        
+        tkinter.Tk().destroy()
+    
+   
+   
+        # def import_data(self, file):
+        #     try:            
+        #         conn = db.create_connection()
+        #         cursor = conn.cursor()
+        #         cursor.execute('DROP TABLE tb_assistidos')
+        #         conn.commit()
+        #         cursor.execute('DROP TABLE tb_entrevistas')
+        #         conn.commit()
+                
+        #         wb = pd.ExcelFile(file)            
+
+        #         for sheet in wb.sheet_names:
+        #             if sheet == 'tb_assistidos':               
+        #                 df = pd.read_excel(file, sheet_name=sheet, converters={'id_assistido': int, 'Nome':str, 'Data_de_nascimento': str, 'Telefone_1': str, 'Telefone_2': str, 'Genero': str, 'Estado_civil': str, 'Ocupacao': str, 'Reside_com': str, 'Endereco': str, 'Bairro': str, 'Numero': str, 'Cidade': str, 'Estado': str, 'Toma_sedativos': str, 'Tratamento_medico': str, 'Dorme_bem': str, 'Vicios': str, 'Sonhos': str, 'Trabalho': str, 'Familia': str, 'Alimentacao': str, 'Info_para_DEPOE': str, 'Ultimo_tratamento': str, 'Cursos': str, 'Encaminhamento': str, 'Tratamentos': str, 'Orientacao_espiritual': str})
+        #                 df.to_sql(sheet, conn, index=False)
+        #             else:
+        #                 df = pd.read_excel(file, sheet_name=sheet, converters={'id_entrevista': int, 'id_assistido': int, 'Entrevistador': str, 'Tratamento': str, 'Entrevista': str})                    
+        #                 df.to_sql(sheet, conn, index=False)              
+        #         conn.commit()
+                
+        #         root = tkinter.Tk()
+        #         root.withdraw()
+        #         messagebox.showinfo('SUCESSO', 'Dados importados e substituidos com sucesso!\nSaindo sistema para aplicar atualizações...')        
+        #         tkinter.Tk().destroy()            
+        #     except sql.Error as e:
+        #         print(e)   
+        #     finally:
+        #         db.close_connection(conn)
             
-            root = tkinter.Tk()
-            root.withdraw()
-            messagebox.showinfo('SUCESSO', 'Dados importados e substituidos com sucesso!\nSaindo sistema para aplicar atualizações...')        
-            tkinter.Tk().destroy()            
-        except sql.Error as e:
-            print(e)   
-        finally:
-            db.close_connection(conn)
+                              
+    def import_data(self, file):        
+        os.remove('sga_database.db')            
+        copyfile(file, 'sga_database.db')
+                    
+        root = tkinter.Tk()
+        root.withdraw()
+        messagebox.showinfo('SUCESSO', 'Dados importados e substituidos com sucesso!\nSaindo sistema para aplicar atualizações...')        
+        tkinter.Tk().destroy()            
             
             
     def create_files_directory(self):

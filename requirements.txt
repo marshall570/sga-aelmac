@@ -1,6 +1,6 @@
-xlrd
-xlsxwriter
-openpyxl
 pyqt5
 pandas
 fpdf
+xlrd
+openpyxl
+xlsxwriter

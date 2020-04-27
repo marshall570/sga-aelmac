@@ -4,7 +4,6 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 from tkinter import messagebox
 from dao_assisted import DAOAssisted
 from dao_user import DAOUser
-from PyQt5.QtWidgets import QFileDialog
 
 dao_assisted = DAOAssisted()
 dao_user = DAOUser()
@@ -72,7 +71,7 @@ class Ui_FormBackup(object):
                         else:
                             path = os.path.expanduser("~") + '\\Documents\\GERENCIAMENTO_DE_ASSISTIDOS_AELMAC\\BACKUPS\\'
                             
-                        dialog = QFileDialog()        
+                        dialog = QtWidgets.QFileDialog()        
                         file = dialog.getOpenFileName(dialog, 'Selecionar arquivo de backup', path, 'Arquivo de Banco de Dados (*.db)')    
                                                 
                         if file[0] != '':
@@ -112,14 +111,14 @@ class Ui_FormBackup(object):
         self.groupBox.setGeometry(QtCore.QRect(10, 10, 481, 121))
         font = QtGui.QFont()
         font.setFamily("Ubuntu")
-        font.setPointSize(12)
+        font.setPixelSize(12)
         font.setBold(True)
         font.setWeight(75)
         self.groupBox.setFont(font)
         self.groupBox.setObjectName("groupBox")
         font = QtGui.QFont()
         font.setFamily("Ubuntu")
-        font.setPointSize(10)
+        font.setPixelSize(12)
         font.setBold(True)
         font.setWeight(50)
         self.radio_export = QtWidgets.QRadioButton(self.groupBox)
@@ -137,7 +136,7 @@ class Ui_FormBackup(object):
         self.groupBox_2.setGeometry(QtCore.QRect(10, 140, 481, 211))
         font = QtGui.QFont()
         font.setFamily("Ubuntu")
-        font.setPointSize(12)
+        font.setPixelSize(12)
         font.setBold(True)
         font.setWeight(75)
         self.groupBox_2.setFont(font)
@@ -148,7 +147,7 @@ class Ui_FormBackup(object):
         self.txt_user = QtWidgets.QLineEdit(self.groupBox_2)
         self.txt_user.setGeometry(QtCore.QRect(15, 70, 450, 32))
         font = QtGui.QFont()
-        font.setPointSize(11)
+        font.setPixelSize(11)
         font.setBold(False)
         font.setWeight(50)
         self.txt_user.setFont(font)
@@ -156,7 +155,7 @@ class Ui_FormBackup(object):
         self.txt_password = QtWidgets.QLineEdit(self.groupBox_2)
         self.txt_password.setGeometry(QtCore.QRect(15, 150, 410, 32))
         font = QtGui.QFont()
-        font.setPointSize(11)
+        font.setPixelSize(11)
         font.setBold(False)
         font.setWeight(50)
         self.txt_password.setFont(font)
@@ -179,7 +178,7 @@ class Ui_FormBackup(object):
         self.btn_execute.setGeometry(QtCore.QRect(10, 360, 481, 34))
         font = QtGui.QFont()
         font.setFamily("Ubuntu")
-        font.setPointSize(12)
+        font.setPixelSize(12)
         font.setBold(True)
         font.setWeight(75)
         self.btn_execute.setFont(font)

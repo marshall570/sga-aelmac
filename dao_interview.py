@@ -61,7 +61,7 @@ class DAOInterview:
 
             root = tkinter.Tk()
             root.withdraw()
-            messagebox.showinfo('CADASTRADO', 'Entrevista registrada com sucesso!\nSaindo do modo de edição...')     
+            messagebox.showinfo('CADASTRADO', 'Entrevista registrada com sucesso!')     
             tkinter.Tk().destroy()            
         except sql.Error as e:
             print(e)

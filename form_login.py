@@ -19,19 +19,20 @@ class Ui_FormLogin(object):
         if self.password_visible is True:
             self.txt_password.setEchoMode(QtWidgets.QLineEdit.Password)
             icon = QtGui.QIcon()
-            icon.addPixmap(QtGui.QPixmap("images/EnablePassword.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+            icon.addPixmap(QtGui.QPixmap("images/eye-off.svg"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
             self.btn_show_password.setIcon(icon)
             self.password_visible = False
         else:
             self.txt_password.setEchoMode(QtWidgets.QLineEdit.Normal)
             icon = QtGui.QIcon()
-            icon.addPixmap(QtGui.QPixmap("images/DisablePassword.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+            icon.addPixmap(QtGui.QPixmap("images/eye.svg"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
             self.btn_show_password.setIcon(icon)
             self.password_visible = True
 
     def btn_signin_clicked(self):
         this_window = QtWidgets.QApplication.activeWindow()        
         u.user = self.txt_user.text().strip()
+
         if dao_user.register_count_user(u) < 1:
             root = tkinter.Tk()
             root.withdraw()
@@ -61,10 +62,10 @@ class Ui_FormLogin(object):
 
     def btn_create_user_clicked(self):
         this_window = QtWidgets.QApplication.activeWindow()        
-        from form_sign_up import Ui_FormSignUp
+        from form_sign_up import UiFormSignUp
         this_window.close()     
         self.FormSignUp = QtWidgets.QMainWindow()
-        self.ui = Ui_FormSignUp()
+        self.ui = UiFormSignUp()
         self.ui.setupUi(self.FormSignUp)
         self.FormSignUp.show()
 
@@ -82,7 +83,7 @@ class Ui_FormLogin(object):
         self.label.setGeometry(QtCore.QRect(10, 10, 630, 31))
         font = QtGui.QFont()
         font.setFamily("Ubuntu")
-        font.setPixelSize(16)
+        font.setPointSize(16)
         font.setBold(True)
         font.setUnderline(True)
         font.setWeight(75)
@@ -93,7 +94,7 @@ class Ui_FormLogin(object):
         self.label_2.setGeometry(QtCore.QRect(10, 57, 100, 21))
         font = QtGui.QFont()
         font.setFamily("Ubuntu")
-        font.setPixelSize(12)
+        font.setPointSize(12)
         font.setBold(True)
         font.setWeight(75)
         self.label_2.setFont(font)
@@ -102,14 +103,14 @@ class Ui_FormLogin(object):
         self.txt_user.setGeometry(QtCore.QRect(10, 85, 631, 32))
         font = QtGui.QFont()
         font.setFamily("Ubuntu")
-        font.setPixelSize(12)
+        font.setPointSize(12)
         self.txt_user.setFont(font)
         self.txt_user.setObjectName("txt_user")
         self.label_3 = QtWidgets.QLabel(self.centralwidget)
         self.label_3.setGeometry(QtCore.QRect(10, 122, 100, 21))
         font = QtGui.QFont()
         font.setFamily("Ubuntu")
-        font.setPixelSize(12)
+        font.setPointSize(12)
         font.setBold(True)
         font.setWeight(75)
         self.label_3.setFont(font)
@@ -118,7 +119,7 @@ class Ui_FormLogin(object):
         self.txt_password.setGeometry(QtCore.QRect(10, 150, 601, 32))
         font = QtGui.QFont()
         font.setFamily("Ubuntu")
-        font.setPixelSize(12)
+        font.setPointSize(12)
         self.txt_password.setFont(font)
         self.txt_password.setEchoMode(QtWidgets.QLineEdit.Password)
         self.txt_password.setObjectName("txt_password")
@@ -130,7 +131,7 @@ class Ui_FormLogin(object):
         font.setWeight(75)
         self.btn_create_user.setFont(font)
         icon1 = QtGui.QIcon()
-        icon1.addPixmap(QtGui.QPixmap("images/vcard_add.png"),QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        icon1.addPixmap(QtGui.QPixmap("images/user-check.svg"),QtGui.QIcon.Normal, QtGui.QIcon.Off)
         self.btn_create_user.setIcon(icon1)
         self.btn_create_user.setObjectName("btn_create_user")
         self.btn_create_user.clicked.connect(self.btn_create_user_clicked)
@@ -142,7 +143,7 @@ class Ui_FormLogin(object):
         font.setWeight(75)
         self.btn_signin.setFont(font)
         icon2 = QtGui.QIcon()
-        icon2.addPixmap(QtGui.QPixmap("images/computer_go.png"),QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        icon2.addPixmap(QtGui.QPixmap("images/arrow-right-circle.svg"),QtGui.QIcon.Normal, QtGui.QIcon.Off)
         self.btn_signin.setIcon(icon2)
         self.btn_signin.setObjectName("btn_signin")
         self.btn_signin.clicked.connect(self.btn_signin_clicked)
@@ -150,7 +151,7 @@ class Ui_FormLogin(object):
         self.btn_show_password.setGeometry(QtCore.QRect(610, 150, 35, 32))
         self.btn_show_password.setText("")
         icon3 = QtGui.QIcon()
-        icon3.addPixmap(QtGui.QPixmap("images/EnablePassword.png"),QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        icon3.addPixmap(QtGui.QPixmap("images/eye-off.svg"),QtGui.QIcon.Normal, QtGui.QIcon.Off)
         self.btn_show_password.setIcon(icon3)
         self.btn_show_password.setIconSize(QtCore.QSize(24, 24))
         self.btn_show_password.setFlat(True)

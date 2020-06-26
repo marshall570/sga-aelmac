@@ -8,62 +8,64 @@ from tkinter import messagebox
 u = User()
 dao = DAOUser()
 
-class Ui_FormSignUp(object):
+
+class UiFormSignUp(object):
     password_visible = False
     confirm_visible = False
     password_matches = False
     strength = 0
-    
+
     def btn_show_password_clicked(self):
         if self.password_visible is True:
             self.txt_password.setEchoMode(QtWidgets.QLineEdit.Password)
             icon = QtGui.QIcon()
-            icon.addPixmap(QtGui.QPixmap("images/EnablePassword.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+            icon.addPixmap(QtGui.QPixmap("images/eye-off.svg"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
             self.btn_show_password.setIcon(icon)
             self.password_visible = False
         else:
             self.txt_password.setEchoMode(QtWidgets.QLineEdit.Normal)
             icon = QtGui.QIcon()
-            icon.addPixmap(QtGui.QPixmap("images/DisablePassword.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+            icon.addPixmap(QtGui.QPixmap("images/eye.svg"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
             self.btn_show_password.setIcon(icon)
-            self.password_visible = True 
+            self.password_visible = True
 
     def btn_show_confirm_clicked(self):
         if self.confirm_visible is True:
             self.txt_confirm.setEchoMode(QtWidgets.QLineEdit.Password)
             icon = QtGui.QIcon()
-            icon.addPixmap(QtGui.QPixmap("images/EnablePassword.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+            icon.addPixmap(QtGui.QPixmap("images/eye-off.svg"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
             self.btn_show_confirm.setIcon(icon)
             self.confirm_visible = False
         else:
             self.txt_confirm.setEchoMode(QtWidgets.QLineEdit.Normal)
             icon = QtGui.QIcon()
-            icon.addPixmap(QtGui.QPixmap("images/DisablePassword.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+            icon.addPixmap(QtGui.QPixmap("images/eye.svg"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
             self.btn_show_confirm.setIcon(icon)
-            self.confirm_visible = True 
-    
+            self.confirm_visible = True
+
     def check_password_strength(self):
         import re
-        
-        if len(self.txt_password.text().strip()) < 8 or self.txt_password.text().strip() == self.txt_name.text().strip() or self.txt_password.text().strip() == self.txt_user.text().strip():
+
+        if len(
+                self.txt_password.text().strip()) < 8 or self.txt_password.text().strip() == self.txt_name.text().strip() or self.txt_password.text().strip() == self.txt_user.text().strip():
             self.strength = 0
         elif len(self.txt_password.text().strip()) >= 8:
             self.strength = 1
         elif len(self.txt_password.text().strip()) >= 10:
             self.strength = 2
-            
+
         if re.search(r"\d", self.txt_password.text().strip()):
             self.strength += 2
-            
+
         if re.search(r"[a-z]", self.txt_password.text().strip()):
             self.strength += 2
-            
+
         if re.search(r"[A-Z]", self.txt_password.text().strip()):
             self.strength += 2
-        
+
         if re.search(r"\W", self.txt_password.text().strip()):
             self.strength += 2
-            
+
         if self.strength < 2:
             self.lbl_strength.setText('FORÇA DA SENHA: MUITO FRACA')
         elif self.strength <= 4:
@@ -73,25 +75,25 @@ class Ui_FormSignUp(object):
         elif self.strength <= 8:
             self.lbl_strength.setText('FORÇA DA SENHA: FORTE')
         else:
-            self.lbl_strength.setText('FORÇA DA SENHA: MUITO FORTE')            
-        self.check_password_matches()  
-    
+            self.lbl_strength.setText('FORÇA DA SENHA: MUITO FORTE')
+        self.check_password_matches()
+
     def check_password_matches(self):
         if self.txt_confirm.text() != self.txt_password.text():
             icon = QtGui.QIcon()
-            icon.addPixmap(QtGui.QPixmap("images/cancel.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
-            icon.addPixmap(QtGui.QPixmap("images/cancel.png"), QtGui.QIcon.Disabled, QtGui.QIcon.Off)
-            icon.addPixmap(QtGui.QPixmap("images/cancel.png"), QtGui.QIcon.Selected, QtGui.QIcon.Off)
+            icon.addPixmap(QtGui.QPixmap("images/x-circle.svg"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+            icon.addPixmap(QtGui.QPixmap("images/x-circle.svg"), QtGui.QIcon.Disabled, QtGui.QIcon.Off)
+            icon.addPixmap(QtGui.QPixmap("images/x-circle.svg"), QtGui.QIcon.Selected, QtGui.QIcon.Off)
             self.btn_check.setIcon(icon)
             return False
         else:
             icon = QtGui.QIcon()
-            icon.addPixmap(QtGui.QPixmap("images/accept.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
-            icon.addPixmap(QtGui.QPixmap("images/accept.png"), QtGui.QIcon.Disabled, QtGui.QIcon.Off)
-            icon.addPixmap(QtGui.QPixmap("images/accept.png"), QtGui.QIcon.Selected, QtGui.QIcon.Off)
+            icon.addPixmap(QtGui.QPixmap("images/check-circle.svg"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+            icon.addPixmap(QtGui.QPixmap("images/check-circle.svg"), QtGui.QIcon.Disabled, QtGui.QIcon.Off)
+            icon.addPixmap(QtGui.QPixmap("images/check-circle.svg"), QtGui.QIcon.Selected, QtGui.QIcon.Off)
             self.btn_check.setIcon(icon)
-            return True          
-        
+            return True
+
     def btn_signup_clicked(self):
         this_window = QtWidgets.QApplication.activeWindow()
         if len(self.txt_password.text()) < 1:
@@ -113,37 +115,42 @@ class Ui_FormSignUp(object):
                 if dao.register_count_user(u) > 0:
                     root = tkinter.Tk()
                     root.withdraw()
-                    messagebox.showerror('AÇÃO NÃO PERMITIDA', 'O usuário já está cadastrado no banco de dados. Tente outro nome de usuário.')
+                    messagebox.showerror('AÇÃO NÃO PERMITIDA',
+                                         'O usuário já está cadastrado no banco de dados. Tente outro nome de usuário.')
                     tkinter.Tk().destroy()
                 else:
                     if self.lbl_strength.text().endswith('MUITO FRACA'):
                         root = tkinter.Tk()
                         root.withdraw()
-                        messagebox.showerror('AÇÃO NÃO PERMITIDA', 'A senha inserida é MUITO FRACA, insira uma senha mais forte para efetuar o cadastro.')
+                        messagebox.showerror('AÇÃO NÃO PERMITIDA',
+                                             'A senha inserida é MUITO FRACA, insira uma senha mais forte para efetuar o cadastro.')
                         tkinter.Tk().destroy()
                     else:
-                        if self.lbl_strength.text().endswith('FRACA') and self.cmb_category.currentText() == 'ADMINISTRADOR':            
+                        if self.lbl_strength.text().endswith(
+                                'FRACA') and self.cmb_category.currentText() == 'ADMINISTRADOR':
                             root = tkinter.Tk()
                             root.withdraw()
-                            messagebox.showerror('AÇÃO NÃO PERMITIDA', 'Usuário com categoria ADMINISTRADOR necessita senha com força ACEITÁVEL ou maior')
+                            messagebox.showerror('AÇÃO NÃO PERMITIDA',
+                                                 'Usuário com categoria ADMINISTRADOR necessita senha com força ACEITÁVEL ou maior')
                             tkinter.Tk().destroy()
-                        elif self.lbl_strength.text().endswith('FRACA') and self.cmb_category.currentText() != 'ADMINISTRADOR':
+                        elif self.lbl_strength.text().endswith(
+                                'FRACA') and self.cmb_category.currentText() != 'ADMINISTRADOR':
                             root = tkinter.Tk()
                             root.withdraw()
                             choice = messagebox.askquestion('ATENÇÃO', 'Deseja criar usuário com uma senha FRACA?')
                             tkinter.Tk().destroy()
-                            
+
                             if choice == 'yes':
                                 u.code = dao.id_gen_user()
                                 dao.insert_user(u)
                                 root = tkinter.Tk()
                                 root.withdraw()
-                                
+
                                 choice = messagebox.askquestion('ATENÇÃO', 'Deseja voltar para a TELA DE LOGIN?')
                                 tkinter.Tk().destroy()
-                                
+
                                 if choice == 'yes':
-                                    from form_login import Ui_FormLogin                                    
+                                    from form_login import Ui_FormLogin
                                     this_window.close()
                                     self.FormLogin = QtWidgets.QMainWindow()
                                     self.ui = Ui_FormLogin()
@@ -151,10 +158,10 @@ class Ui_FormSignUp(object):
                                     self.FormLogin.show()
                         else:
                             u.code = dao.id_gen_user()
-                            dao.insert_user(u)    
+                            dao.insert_user(u)
                             choice = messagebox.askquestion('ATENÇÃO', 'Deseja voltar para a TELA DE LOGIN?')
                             tkinter.Tk().destroy()
-                                
+
                             if choice == 'yes':
                                 from form_login import Ui_FormLogin
                                 this_window.close()
@@ -162,8 +169,7 @@ class Ui_FormSignUp(object):
                                 self.ui = Ui_FormLogin()
                                 self.ui.setupUi(self.FormLogin)
                                 self.FormLogin.show()
-    
-    
+
     def setupUi(self, FormSignUp):
         FormSignUp.setObjectName("FormSignUp")
         FormSignUp.resize(500, 545)
@@ -226,7 +232,7 @@ class Ui_FormSignUp(object):
         self.btn_show_password.setGeometry(QtCore.QRect(460, 245, 32, 32))
         self.btn_show_password.setText("")
         icon1 = QtGui.QIcon()
-        icon1.addPixmap(QtGui.QPixmap("images/EnablePassword.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        icon1.addPixmap(QtGui.QPixmap("images/eye-off.svg"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
         self.btn_show_password.setIcon(icon1)
         self.btn_show_password.setFlat(True)
         self.btn_show_password.setObjectName("btn_show_password")
@@ -263,9 +269,9 @@ class Ui_FormSignUp(object):
         self.btn_check.setGeometry(QtCore.QRect(130, 320, 21, 21))
         self.btn_check.setText("")
         icon2 = QtGui.QIcon()
-        icon2.addPixmap(QtGui.QPixmap("images/cancel.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
-        icon2.addPixmap(QtGui.QPixmap("images/cancel.png"), QtGui.QIcon.Disabled, QtGui.QIcon.Off)
-        icon2.addPixmap(QtGui.QPixmap("images/cancel.png"), QtGui.QIcon.Selected, QtGui.QIcon.Off)
+        icon2.addPixmap(QtGui.QPixmap("images/x-circle.svg"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        icon2.addPixmap(QtGui.QPixmap("images/x-circle.svg"), QtGui.QIcon.Disabled, QtGui.QIcon.Off)
+        icon2.addPixmap(QtGui.QPixmap("images/x-circle.svg"), QtGui.QIcon.Selected, QtGui.QIcon.Off)
         self.btn_check.setIcon(icon2)
         self.btn_check.setEnabled(False)
         self.btn_check.setFlat(True)
@@ -293,7 +299,7 @@ class Ui_FormSignUp(object):
         font.setWeight(75)
         self.btn_signup.setFont(font)
         icon3 = QtGui.QIcon()
-        icon3.addPixmap(QtGui.QPixmap("images/vcard_add.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        icon3.addPixmap(QtGui.QPixmap("images/user-check.svg"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
         self.btn_signup.setIcon(icon3)
         self.btn_signup.setObjectName("btn_signup")
         self.btn_signup.clicked.connect(self.btn_signup_clicked)
@@ -327,9 +333,10 @@ class Ui_FormSignUp(object):
 
 if __name__ == "__main__":
     import sys
+
     app = QtWidgets.QApplication(sys.argv)
     FormSignUp = QtWidgets.QMainWindow()
-    ui = Ui_FormSignUp()
+    ui = UiFormSignUp()
     ui.setupUi(FormSignUp)
     FormSignUp.show()
     sys.exit(app.exec_())

@@ -15,13 +15,13 @@ class Ui_FormBackup(object):
         if self.password_visible is True:
             self.txt_password.setEchoMode(QtWidgets.QLineEdit.Password)
             icon = QtGui.QIcon()
-            icon.addPixmap(QtGui.QPixmap("images/EnablePassword.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+            icon.addPixmap(QtGui.QPixmap("images/eye-off.svg"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
             self.btn_show_password.setIcon(icon)
             self.password_visible = False
         else:
             self.txt_password.setEchoMode(QtWidgets.QLineEdit.Normal)
             icon = QtGui.QIcon()
-            icon.addPixmap(QtGui.QPixmap("images/DisablePassword.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+            icon.addPixmap(QtGui.QPixmap("images/eye.svg"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
             self.btn_show_password.setIcon(icon)
             self.password_visible = True    
         
@@ -169,7 +169,7 @@ class Ui_FormBackup(object):
         self.btn_show_password.setGeometry(QtCore.QRect(430, 150, 32, 32))
         self.btn_show_password.setText("")
         icon1 = QtGui.QIcon()
-        icon1.addPixmap(QtGui.QPixmap("images/EnablePassword.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        icon1.addPixmap(QtGui.QPixmap("images/eye-off.svg"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
         self.btn_show_password.setIcon(icon1)
         self.btn_show_password.setFlat(True)
         self.btn_show_password.setObjectName("btn_show_password")
@@ -183,7 +183,7 @@ class Ui_FormBackup(object):
         font.setWeight(75)
         self.btn_execute.setFont(font)
         icon2 = QtGui.QIcon()
-        icon2.addPixmap(QtGui.QPixmap("images/database_go.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        icon2.addPixmap(QtGui.QPixmap("images/database.svg"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
         self.btn_execute.setIcon(icon2)
         self.btn_execute.setObjectName("btn_execute")
         self.btn_execute.clicked.connect(self.btn_execute_clicked)

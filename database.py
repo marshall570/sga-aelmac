@@ -1,12 +1,12 @@
 # -*- coding: utf-8 -*-
 import sqlite3 as sql
 
+
 class Data:
-    def __init__(self, conn = None, cursor = None, rs = None):
+    def __init__(self, conn=None, cursor=None, rs=None):
         self.conn = conn
         self.cursor = cursor
         self.rs = rs
-        
 
     def create_connection(self):
         conn = None
@@ -18,9 +18,8 @@ class Data:
             print(e)
         return conn
 
-
-    def close_connection(self, conn = None, cursor = None):
-        try:            
+    def close_connection(self, conn=None, cursor=None):
+        try:
             if cursor is not None:
                 cursor.close()
 

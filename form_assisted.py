@@ -949,7 +949,13 @@ class Ui_FormFicha(object):
             text = text[:-2]
 
         return text
-                   
+    
+
+    def index_changed(self):
+        if self.txt_index.value() != 0:
+            self.index = self.txt_index.value()
+            self.fill_form()
+        
     ####################################################
     # BUTTONS METHODS    
     ####################################################
@@ -1045,6 +1051,7 @@ class Ui_FormFicha(object):
                     historic_message = 'ADICIONOU o registro de <{}>'.format(self.txt_name.text().strip().upper())
                     dao_assisted.insert_assisted(a)
                     dao_user.register_changes(u.name, historic_message)
+                    self.txt_index.setMaximum(dao_assisted.id_gen_assisted() - 1)
                     self.adding = False      
                 elif self.editing == True and self.adding == False:
                     self.save_changes()
@@ -1071,15 +1078,19 @@ class Ui_FormFicha(object):
             historic_message = f'DELETOU o registro de <{a.name}>'
             dao_user.register_changes(u.name, historic_message)
             if dao_assisted.id_gen_assisted() - 1 == 0:
+                self.txt_index.setMaximum(0)
+                self.txt_index.setMinimum(0)
                 self.empty_form()
-                self.action_buttons()                
+                self.action_buttons()
             else:
+                self.txt_index.setMaximum(dao_assisted.id_gen_assisted() - 1)
                 if self.index > dao_assisted.id_gen_assisted() - 1:
                     self.index -= 1
                 elif self.index < dao_assisted.id_gen_assisted() - 1:
                     self.index += 1                    
                 else:
                     self.index = self.index
+                self.txt_index.setValue(self.index)
                     
                 self.fill_form()
                 self.action_buttons()
@@ -2774,6 +2785,7 @@ class Ui_FormFicha(object):
         self.gridLayout.addWidget(self.tabWidget, 1, 0, 1, 2)
         FormFicha.setCentralWidget(self.centralwidget)
 
+        self.txt_index.valueChanged.connect(self.index_changed)
                 
         self.btn_add.clicked.connect(self.btn_add_clicked)
         self.btn_save.clicked.connect(self.btn_save_clicked)
@@ -2785,13 +2797,29 @@ class Ui_FormFicha(object):
         self.btn_report.clicked.connect(self.btn_reports_clicked)
         self.btn_log_out.clicked.connect(self.btn_log_out_clicked)
 
+        self.btn_new_interview.clicked.connect(self.btn_new_interview_clicked)
+        self.btn_save_interview.clicked.connect(self.btn_save_interview_clicked)
+        self.tb_interviews.doubleClicked.connect(self.cell_double_clicked)    
+
         self.radio_addiction_yes.clicked.connect(self.radio_addictions_yes_toggled)
         self.radio_addiction_no.clicked.connect(self.radio_addictions_no_toggled)        
 
-        # self.get_user()
+        self.get_user()
         
-        self.enable_read_only()        
-        self.action_buttons()       
+        self.enable_read_only()
+
+        if dao_assisted.id_gen_assisted() - 1 != 0:
+            self.txt_index.setValue(dao_assisted.id_gen_assisted() - 1)
+            self.txt_index.setMinimum(1)
+            self.txt_index.setMaximum(dao_assisted.id_gen_assisted() - 1)
+            self.fill_form()
+        else:
+            self.empty_form()
+            self.disable_navigation()
+            self.txt_index.setMaximum(0)
+            self.txt_index.setMinimum(0)
+
+        self.action_buttons()
 
         self.retranslateUi(FormFicha)
         self.tabWidget.setCurrentIndex(0)

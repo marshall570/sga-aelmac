@@ -2,6 +2,6 @@ sga_database.db
 __pycache__/
 .vscode/
 .venv/
-uis/
+uis
 old_assisted.py
 Registro_de_alteracoes.xlsx

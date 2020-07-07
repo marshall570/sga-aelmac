@@ -1,22 +1,19 @@
 # -*- coding: utf-8 -*-
 import tkinter
+import random
+import string
 from PyQt5 import QtCore, QtGui, QtWidgets
 from tkinter import messagebox
-from dto_user import User
-from dto_assisted import Assisted
-from dto_interview import Interview
-from dao_assisted import DAOAssisted
-from dao_interview import DAOInterview
-from dao_user import DAOUser
+from AssistedModel import AssistedModel
+from InterviewModel import InterviewModel
+from AssistedController import AssistedController
 
 # GLOBAL OBJECTS
-dao_assisted = DAOAssisted()
-dao_interview = DAOInterview()
-dao_user = DAOUser()
+assisted_controller = AssistedController()
 
-a = Assisted()
-i = Interview()
-u = User()
+assisted_model = AssistedModel()
+interview_model = InterviewModel()
+
 class Ui_FormFicha(object):
     ####################################################    
     # FORM VARIABLES    
@@ -26,18 +23,20 @@ class Ui_FormFicha(object):
     adding = False
     editing = False
     writing_interview = False
-    old_values = []
-    
+    old_values = []    
+    name = None
+    user = None
+    category = None
     
     ####################################################    
     # PASSIVE METHODS
     ####################################################
     def get_user(self):
-        result = dao_user.select_active_user()
+        result = assisted_controller.select_active_user()
 
-        u.name = result[0]
-        u.user = result[1]
-        u.category = result[2]
+        name = result[0]
+        user = result[1]
+        category = result[2]
     
     def empty_form(self):
         self.txt_name.setText('')
@@ -187,8 +186,10 @@ class Ui_FormFicha(object):
     
     def fill_form(self):
         self.empty_form()
-        rs = dao_assisted.select_assisted(a, self.index)
-        new_values = []            
+        rs = assisted_controller.select_assisted(self.index)
+        
+        new_values = []      
+              
         for value in rs:
             if value == None:
                 item = ''
@@ -196,136 +197,137 @@ class Ui_FormFicha(object):
                 item = value
             new_values.append(item)
                                                                             
-        a.code = new_values[0]
-        a.name = new_values[1]
-        a.date_of_birth = new_values[2]
-        a.phone1 = new_values[3]
-        a.phone2 = new_values[4]
-        a.gender = new_values[5]
-        a.civil_state = new_values[6]
-        a.ocupation = new_values[7]
-        a.lives_with = new_values[8]
-        a.address = new_values[9]
-        a.neighbourhood = new_values[10]
-        a.number = new_values[11]
-        a.city = new_values[12]
-        a.state = new_values[13]
-        a.sedatives = new_values[14]
-        a.medical_treatment = new_values[15]
-        a.sleep_well = new_values[16]
-        a.addictions = new_values[17]
-        a.dreams = new_values[18]
-        a.work = new_values[19]
-        a.family = new_values[20]
-        a.feeding = new_values[21]
-        a.traits = new_values[22]
-        a.latest_treatment = new_values[23]
-        a.courses = new_values[24]
-        a.fowarding = new_values[25]
-        a.treatment = new_values[26]
-        a.guidance = new_values[27]                
+        assisted_model.serial = new_values[0]
+        assisted_model.position = new_values[1]
+        assisted_model.name = new_values[2]
+        assisted_model.date_of_birth = new_values[3]
+        assisted_model.phone1 = new_values[4]
+        assisted_model.phone2 = new_values[5]
+        assisted_model.gender = new_values[6]
+        assisted_model.civil_state = new_values[7]
+        assisted_model.ocupation = new_values[8]
+        assisted_model.lives_with = new_values[9]
+        assisted_model.address = new_values[10]
+        assisted_model.neighbourhood = new_values[11]
+        assisted_model.number = new_values[12]
+        assisted_model.city = new_values[13]
+        assisted_model.state = new_values[14]
+        assisted_model.sedatives = new_values[15]
+        assisted_model.medical_treatment = new_values[16]
+        assisted_model.sleep_well = new_values[17]
+        assisted_model.addictions = new_values[18]
+        assisted_model.dreams = new_values[19]
+        assisted_model.work = new_values[20]
+        assisted_model.family = new_values[21]
+        assisted_model.feeding = new_values[22]
+        assisted_model.traits = new_values[23]
+        assisted_model.latest_treatment = new_values[24]
+        assisted_model.courses = new_values[25]
+        assisted_model.fowarding = new_values[26]
+        assisted_model.treatment = new_values[27]
+        assisted_model.guidance = new_values[28]                
         
         self.clear_table_view()
         self.fill_table_view()
         
-        self.txt_name.setText(a.name)
-        self.txt_date.setText(a.date_of_birth)
-        self.txt_phone1.setText(a.phone1)
-        self.txt_phone2.setText(a.phone2)
-        self.cmb_gender.setCurrentText(a.gender)                        
-        self.cmb_civil_state.setCurrentText(a.civil_state)                        
-        self.txt_ocupation.setText(a.ocupation)
-        self.txt_lives_with.setText(a.lives_with)
-        self.txt_address.setText(a.address)
-        self.txt_neighbourhood.setText(a.neighbourhood)
-        self.txt_number.setText(a.number)
-        self.txt_city.setText(a.city)
-        self.cmb_state.setCurrentText(a.state)                        
+        self.txt_name.setText(assisted_model.name)
+        self.txt_date.setText(assisted_model.date_of_birth)
+        self.txt_phone1.setText(assisted_model.phone1)
+        self.txt_phone2.setText(assisted_model.phone2)
+        self.cmb_gender.setCurrentText(assisted_model.gender)                        
+        self.cmb_civil_state.setCurrentText(assisted_model.civil_state)                        
+        self.txt_ocupation.setText(assisted_model.ocupation)
+        self.txt_lives_with.setText(assisted_model.lives_with)
+        self.txt_address.setText(assisted_model.address)
+        self.txt_neighbourhood.setText(assisted_model.neighbourhood)
+        self.txt_number.setText(assisted_model.number)
+        self.txt_city.setText(assisted_model.city)
+        self.cmb_state.setCurrentText(assisted_model.state)                        
                         
-        if a.sedatives == 'Não':
+        if assisted_model.sedatives == 'Não':
             self.radio_sedative_no.toggle()
         else:
             self.radio_sedative_yes.toggle()
-        if a.medical_treatment == 'Não':
+        if assisted_model.medical_treatment == 'Não':
             self.radio_medical_treatment_no.toggle()
         else:
             self.radio_medical_treatment_yes.toggle()
-        if a.sleep_well == 'Não':
+        if assisted_model.sleep_well == 'Não':
             self.radio_sleep_well_no.toggle()
         else:
             self.radio_sleep_well_yes.toggle()
        
             
-        if a.addictions.startswith('Não'):
+        if assisted_model.addictions.startswith('Não'):
             self.radio_addiction_no.toggle()
         else:
             self.radio_addiction_yes.toggle()
-            if a.addictions.find('Álcool') != -1:
+            if assisted_model.addictions.find('Álcool') != -1:
                 self.check_alcohol.toggle()
-            if a.addictions.find('Tabaco') != -1:
+            if assisted_model.addictions.find('Tabaco') != -1:
                 self.check_tobacco.toggle()
-            if a.addictions.find('Fumo') != -1:
+            if assisted_model.addictions.find('Fumo') != -1:
                 self.check_cigarette.toggle()
-            if a.addictions.find('Drogas') != -1:
+            if assisted_model.addictions.find('Drogas') != -1:
                 self.check_drugs.toggle()
-            if a.addictions.find('Sexo') != -1:
+            if assisted_model.addictions.find('Sexo') != -1:
                 self.check_sex.toggle()
                 
                                    
-        if a.dreams.startswith('SONHO'):
+        if assisted_model.dreams.startswith('SONHO'):
             self.radio_dreams_yes.toggle()            
-            self.txt_dreams.setText(a.dreams[7:])
+            self.txt_dreams.setText(assisted_model.dreams[7:])
         else:
             self.radio_dreams_no.toggle()        
-            self.txt_dreams.setText(a.dreams[9:])
+            self.txt_dreams.setText(assisted_model.dreams[9:])
        
        
-        self.txt_work.setText(a.work)
-        self.txt_family.setText(a.family)
-        self.cmb_feeding.setCurrentText(a.feeding)                        
+        self.txt_work.setText(assisted_model.work)
+        self.txt_family.setText(assisted_model.family)
+        self.cmb_feeding.setCurrentText(assisted_model.feeding)                        
         
         
-        if a.traits.find('Depressão aguda') != -1:
+        if assisted_model.traits.find('Depressão aguda') != -1:
             self.check_depression.toggle()
-        if a.traits.find('Distúrbios mentais') != -1:
+        if assisted_model.traits.find('Distúrbios mentais') != -1:
             self.check_mental_disorder.toggle()
-        if a.traits.find('Pré-cirurgia') != -1:
+        if assisted_model.traits.find('Pré-cirurgia') != -1:
             self.check_pre_surgery.toggle()
-        if a.traits.find('Pós-cirurgia') != -1:
+        if assisted_model.traits.find('Pós-cirurgia') != -1:
             self.check_post_surgery.toggle()
-        if a.traits.find('Vítima de violência') != -1:
+        if assisted_model.traits.find('Vítima de violência') != -1:
             self.check_victim_of_violence.toggle()
-        if a.traits.find('Doença física em fase aguda') != -1:
+        if assisted_model.traits.find('Doença física em fase aguda') != -1:
             self.check_acute_physical_illness.toggle()
-        if a.traits.find('Doença grave desconhecida') != -1:
+        if assisted_model.traits.find('Doença grave desconhecida') != -1:
             self.check_unknow_disease.toggle()
-        if a.traits.find('Ideia de eliminar alguém') != -1:
+        if assisted_model.traits.find('Ideia de eliminar alguém') != -1:
             self.check_idea_of_eliminate.toggle()
-        if a.traits.find('Veio da Umbanda') != -1:
+        if assisted_model.traits.find('Veio da Umbanda') != -1:
             self.check_umbanda.toggle()
-        if a.traits.find('Desaparecimento') != -1:
+        if assisted_model.traits.find('Desaparecimento') != -1:
             self.check_disappearence.toggle()
-        if a.traits.find('Homicida') != -1:
+        if assisted_model.traits.find('Homicida') != -1:
             self.check_homicidal.toggle()
-        if a.traits.find('Problema continua') != -1:
+        if assisted_model.traits.find('Problema continua') != -1:
             self.check_problem_continues.toggle()
-        if a.traits.find('Prática de violência') != -1:
+        if assisted_model.traits.find('Prática de violência') != -1:
             self.check_violence_practice.toggle()
-        if a.traits.find('Doença física grave') != -1:
+        if assisted_model.traits.find('Doença física grave') != -1:
             self.check_serious_physical_illness.toggle()
-        if a.traits.find('Doença mental agressiva') != -1:
+        if assisted_model.traits.find('Doença mental agressiva') != -1:
             self.check_aggresive_mental_illness.toggle()
-        if a.traits.find('Possessão') != -1:
+        if assisted_model.traits.find('Possessão') != -1:
             self.check_possession.toggle()
-        if a.traits.find('Problemas graves no lar') != -1:
+        if assisted_model.traits.find('Problemas graves no lar') != -1:
             self.check_problems_at_home.toggle()
-        if a.traits.find('Síndrome do Pânico') != -1:
+        if assisted_model.traits.find('Síndrome do Pânico') != -1:
             self.check_panic_sindrome.toggle()
-        if a.traits.find(' --- ') != -1:
-            text = a.traits.split(' --- ')
+        if assisted_model.traits.find(' --- ') != -1:
+            text = assisted_model.traits.split(' --- ')
             self.txt_traits.setText(text[1])
         else:
-            self.txt_traits.setText(a.traits)
+            self.txt_traits.setText(assisted_model.traits)
         
         
         self.txt_interviewer.setText('')
@@ -334,82 +336,82 @@ class Ui_FormFicha(object):
         self.btn_save_interview.setEnabled(False)
         
         
-        if a.courses.find('Preparatório') != -1:
+        if assisted_model.courses.find('Preparatório') != -1:
             self.check_preparatory.toggle()
-        if a.courses.find('Básico 1') != -1:
+        if assisted_model.courses.find('Básico 1') != -1:
             self.check_basic1.toggle()
-        if a.courses.find('Básico 2') != -1:
+        if assisted_model.courses.find('Básico 2') != -1:
             self.check_basic2.toggle()
-        if a.courses.find('Aprendiz do Evangelho 1') != -1:
+        if assisted_model.courses.find('Aprendiz do Evangelho 1') != -1:
             self.check_apprentice1.toggle()
-        if a.courses.find('Aprendiz do Evangelho 2') != -1:
+        if assisted_model.courses.find('Aprendiz do Evangelho 2') != -1:
             self.check_apprentice2.toggle()
-        if a.courses.find('Educação Mediúnica 1') != -1:
+        if assisted_model.courses.find('Educação Mediúnica 1') != -1:
             self.check_education1.toggle()
-        if a.courses.find('Educação Mediúnica 2') != -1:
+        if assisted_model.courses.find('Educação Mediúnica 2') != -1:
             self.check_education2.toggle()
-        if a.courses.find('Expositor') != -1:
+        if assisted_model.courses.find('Expositor') != -1:
             self.check_exposer.toggle()
-        if a.courses.find('Filosofia') != -1:
+        if assisted_model.courses.find('Filosofia') != -1:
             self.check_philosophy.toggle()
             
             
-        if a.fowarding.find('Diretoria') != -1:
+        if assisted_model.fowarding.find('Diretoria') != -1:
             self.check_directors.toggle()
-        if a.fowarding.find('Depasse') != -1:
+        if assisted_model.fowarding.find('Depasse') != -1:
             self.check_depass.toggle()
-        if a.fowarding.find('Assistente Social') != -1:
+        if assisted_model.fowarding.find('Assistente Social') != -1:
             self.check_social_assistant.toggle()
-        if a.fowarding.find('Ensino') != -1:
+        if assisted_model.fowarding.find('Ensino') != -1:
             self.check_teaching.toggle()
-        if a.fowarding.find(' --- ') != -1:
-            text = a.fowarding.split(' --- ')            
+        if assisted_model.fowarding.find(' --- ') != -1:
+            text = assisted_model.fowarding.split(' --- ')            
             self.txt_fowarding.setText(text[1])
         else:
-            self.txt_fowarding.setText(a.fowarding)
+            self.txt_fowarding.setText(assisted_model.fowarding)
         
         
-        if a.treatment.find('Pasteur A2') != -1:
+        if assisted_model.treatment.find('Pasteur A2') != -1:
             self.radio_pasteur_a2.toggle()
-        if a.treatment.find('Pasteur A4') != -1:
+        if assisted_model.treatment.find('Pasteur A4') != -1:
             self.radio_pasteur_a4.toggle()
-        if a.treatment.find('Pasteur 1/2') != -1:
+        if assisted_model.treatment.find('Pasteur 1/2') != -1:
             self.radio_pasteur_12.toggle()
-        if a.treatment.find('Pasteur A3') != -1:
+        if assisted_model.treatment.find('Pasteur A3') != -1:
             self.radio_pasteur_a3.toggle()
-        if a.treatment.find('Pasteur 3E3M') != -1:
+        if assisted_model.treatment.find('Pasteur 3E3M') != -1:
             self.radio_pasteur_3e3m.toggle()
-        if a.treatment.find('Pasteur P3F-Cura') != -1:
+        if assisted_model.treatment.find('Pasteur P3F-Cura') != -1:
             self.radio_pasteur_p3f.toggle()
             
             
-        if a.guidance.find('Bons pensamentos') != -1:
+        if assisted_model.guidance.find('Bons pensamentos') != -1:
             self.check_good_thoughts.toggle()
-        if a.guidance.find('Evangelho no lar') != -1:
+        if assisted_model.guidance.find('Evangelho no lar') != -1:
             self.check_home_gospel.toggle()
-        if a.guidance.find('Leituras edificantes') != -1:
+        if assisted_model.guidance.find('Leituras edificantes') != -1:
             self.check_readings.toggle()
-        if a.guidance.find('Médico de confiança') != -1:
+        if assisted_model.guidance.find('Médico de confiança') != -1:
             self.check_doctor.toggle()
-        if a.guidance.find('Cesta básica') != -1:
+        if assisted_model.guidance.find('Cesta básica') != -1:
             self.check_care_package.toggle()
-        if a.guidance.find('Não fazer tratamento') != -1:
+        if assisted_model.guidance.find('Não fazer tratamento') != -1:
             self.check_no_treatment.toggle()
-        if a.guidance.find('Higienização do lar') != -1:
+        if assisted_model.guidance.find('Higienização do lar') != -1:
             self.check_home_sanitation.toggle()
-        if a.guidance.find('Reforma íntima') != -1:
+        if assisted_model.guidance.find('Reforma íntima') != -1:
             self.check_intimate_makeover.toggle()
-        if a.guidance.find('Estudo da doutrina') != -1:
+        if assisted_model.guidance.find('Estudo da doutrina') != -1:
             self.check_study.toggle()
-        if a.guidance.find('Frequência na assistência') != -1:
+        if assisted_model.guidance.find('Frequência na assistência') != -1:
             self.check_frequency.toggle()
-        if a.guidance.find('Não aplicar passe') != -1:
+        if assisted_model.guidance.find('Não aplicar passe') != -1:
             self.check_no_pass.toggle()
-        if a.guidance.find(' --- ') != -1:
-            text = a.guidance.split(' --- ')
+        if assisted_model.guidance.find(' --- ') != -1:
+            text = assisted_model.guidance.split(' --- ')
             self.txt_info.setText(text[1])
         else:
-            self.txt_info.setText(a.guidance)
+            self.txt_info.setText(assisted_model.guidance)
               
     def enable_navigation(self):
         self.txt_index.setEnabled(True)
@@ -610,7 +612,7 @@ class Ui_FormFicha(object):
         self.txt_info.setReadOnly(False)    
       
     def action_buttons(self):
-        if dao_assisted.id_gen_assisted() - 1 == 0:
+        if assisted_controller.count_assisted() == 0:
             self.btn_add.setEnabled(True)
             self.btn_backups.setEnabled(True)
             self.btn_log_out.setEnabled(True)
@@ -632,7 +634,7 @@ class Ui_FormFicha(object):
             self.btn_delete.setEnabled(True)
         
 
-    def get_values(self, a):
+    def get_values(self, assisted_model):
         addictions = ''
         dreams = ''
         traits = ''
@@ -641,24 +643,25 @@ class Ui_FormFicha(object):
         treatments = ''
         guidance = ''
         
-        a.code = dao_assisted.id_gen_assisted()
+        assisted_model.serial = ''.join(random.choices(string.ascii_lowercase + string.digits, k=8))
+        assisted_model.position = assisted_controller.count_assisted() + 1
         
-        a.name = self.txt_name.text().strip().upper()
-        a.date_of_birth = self.txt_date.text().strip()
-        a.phone1 = self.txt_phone1.text().strip() if len(self.txt_phone1.text().strip()) >= 15 else ''
-        a.phone2 = self.txt_phone2.text().strip() if len(self.txt_phone2.text().strip()) >= 14 else ''
-        a.gender = self.cmb_gender.currentText()
-        a.civil_state = self.cmb_civil_state.currentText()
-        a.ocupation = self.txt_ocupation.text().strip().upper()
-        a.lives_with = self.txt_lives_with.text().strip().upper()
-        a.address = self.shorten_places(self.txt_address.text().strip().upper())
-        a.neighbourhood = self.shorten_places(self.txt_neighbourhood.text().strip().upper())
-        a.number = self.txt_number.text().strip().upper()
-        a.city = self.txt_city.text().strip().upper()
-        a.state = self.cmb_state.currentText()
-        a.sedatives = 'Sim' if self.radio_sedative_yes.isChecked() else 'Não'
-        a.medical_treatment = 'Sim' if self.radio_medical_treatment_yes.isChecked() else 'Não'
-        a.sleep_well = 'Sim' if self.radio_sleep_well_yes.isChecked() else 'Não'
+        assisted_model.name = self.txt_name.text().strip().upper()
+        assisted_model.date_of_birth = self.txt_date.text().strip()
+        assisted_model.phone1 = self.txt_phone1.text().strip() if len(self.txt_phone1.text().strip()) >= 15 else ''
+        assisted_model.phone2 = self.txt_phone2.text().strip() if len(self.txt_phone2.text().strip()) >= 14 else ''
+        assisted_model.gender = self.cmb_gender.currentText()
+        assisted_model.civil_state = self.cmb_civil_state.currentText()
+        assisted_model.ocupation = self.txt_ocupation.text().strip().upper()
+        assisted_model.lives_with = self.txt_lives_with.text().strip().upper()
+        assisted_model.address = self.shorten_places(self.txt_address.text().strip().upper())
+        assisted_model.neighbourhood = self.shorten_places(self.txt_neighbourhood.text().strip().upper())
+        assisted_model.number = self.txt_number.text().strip().upper()
+        assisted_model.city = self.txt_city.text().strip().upper()
+        assisted_model.state = self.cmb_state.currentText()
+        assisted_model.sedatives = 'Sim' if self.radio_sedative_yes.isChecked() else 'Não'
+        assisted_model.medical_treatment = 'Sim' if self.radio_medical_treatment_yes.isChecked() else 'Não'
+        assisted_model.sleep_well = 'Sim' if self.radio_sleep_well_yes.isChecked() else 'Não'
         
         
         if self.radio_addiction_yes.isChecked():
@@ -675,7 +678,7 @@ class Ui_FormFicha(object):
                 addictions += ', Sexo'
         else:
             addictions = 'Não'        
-        a.addictions = addictions
+        assisted_model.addictions = addictions
         
         
         if self.radio_dreams_yes.isChecked():
@@ -685,12 +688,12 @@ class Ui_FormFicha(object):
         dreams += self.txt_dreams.toPlainText().strip()
         if dreams.endswith(', '):
             dreams = dreams[:-2]
-        a.dreams = dreams
+        assisted_model.dreams = dreams
         
         
-        a.work = self.txt_work.toPlainText().strip()
-        a.family = self.txt_family.toPlainText().strip()
-        a.feeding = self.cmb_feeding.currentText()
+        assisted_model.work = self.txt_work.toPlainText().strip()
+        assisted_model.family = self.txt_family.toPlainText().strip()
+        assisted_model.feeding = self.cmb_feeding.currentText()
         
         
         if self.check_depression.isChecked():
@@ -735,13 +738,13 @@ class Ui_FormFicha(object):
         if traits.startswith(' --- '):
             traits = traits[5:]
         traits += self.txt_traits.toPlainText().strip()
-        a.traits = traits
+        assisted_model.traits = traits
         
         
         if self.adding == True:
-            a.latest_treatment = 'NENHUM'
+            assisted_model.latest_treatment = 'NENHUM'
         else:
-            a.latest_treatment = self.cmb_treatment.currentText()
+            assisted_model.latest_treatment = self.cmb_treatment.currentText()
         
         
         if self.check_preparatory.isChecked():
@@ -764,7 +767,7 @@ class Ui_FormFicha(object):
             courses += 'Filosofia'
         if courses.endswith(', '):
             courses = courses[:-2]
-        a.courses = courses
+        assisted_model.courses = courses
             
             
         if self.check_directors.isChecked():
@@ -781,7 +784,7 @@ class Ui_FormFicha(object):
         if fowarding.startswith(' --- '):
             fowarding = fowarding[5:]            
         fowarding += self.txt_fowarding.toPlainText().strip()
-        a.fowarding = fowarding
+        assisted_model.fowarding = fowarding
         
         
         if self.radio_pasteur_a2.isChecked():
@@ -798,7 +801,7 @@ class Ui_FormFicha(object):
             treatments += 'Pasteur P3F-Cura'
         if treatments.endswith(', '):
             treatments = treatments[:-2]
-        a.treatment = treatments
+        assisted_model.treatment = treatments
         
                
         if self.check_good_thoughts.isChecked():
@@ -829,7 +832,7 @@ class Ui_FormFicha(object):
         if guidance.startswith(' --- '):
             guidance = guidance[5:]
         guidance += self.txt_info.toPlainText().strip()
-        a.guidance = guidance
+        assisted_model.guidance = guidance
     
     def check_date(self, data):
         import datetime
@@ -904,7 +907,7 @@ class Ui_FormFicha(object):
         return txt
     
     def fill_table_view(self):
-        query_result = dao_interview.select_interview(a)        
+        query_result = assisted_controller.select_interview(assisted_model)
  
         for value in query_result:
             row = []
@@ -917,7 +920,7 @@ class Ui_FormFicha(object):
         self.model.removeRows(0, self.model.rowCount())
     
     def save_changes(self):                  
-        rs = dao_assisted.select_assisted(a, self.index)
+        rs = assisted_controller.select_assisted(self.index)
         for value in rs:
             if value == None:
                 item = ''
@@ -929,7 +932,7 @@ class Ui_FormFicha(object):
         fields = ['Codigo', 'Nome, ', 'Data de Nascimento, ', 'Telefone (celular), ', 'Telefone (residencial), ', 'Gênero, ', 'Estado civil, ', 'Ocupação, ', 'Reside com, ', 'Endereço, ', 'Bairro, ', 'Número, ', 'Cidade, ', 'Estado, ', 'Toma sedativos, ', 'Tratamento médico, ', 'Dorme bem, ', 'Vícios, ', 'Sonhos, ', 'Trabalho, ', 'Família, ', 'Alimentação, ', 'Info para DEPOE, ', 'Ultimo tratamento, ', 'Cursos, ', 'Encaminhamento, ', 'Tratamentos, ', 'Orientação Espiritual']
         new_values = []
         
-        rs = dao_assisted.select_assisted(a, self.index)
+        rs = assisted_controller.select_assisted(self.index)
         for value in rs:
             if value == None:
                 item = ''
@@ -955,6 +958,8 @@ class Ui_FormFicha(object):
         if self.txt_index.value() != 0:
             self.index = self.txt_index.value()
             self.fill_form()
+            self.tabWidget.setCurrentIndex(0)
+
         
     ####################################################
     # BUTTONS METHODS    
@@ -968,9 +973,9 @@ class Ui_FormFicha(object):
         tkinter.Tk().destroy()
                 
         if choice == 'yes':
-            from form_login import Ui_FormLogin
-            dao_user.set_off()
-            dao_user.gen_historic()
+            from Login import Ui_FormLogin
+            assisted_controller.set_off()
+            assisted_controller.gen_historic()
             this_window.close()       
             self.FormLogin = QtWidgets.QMainWindow()
             self.ui = Ui_FormLogin()
@@ -978,14 +983,14 @@ class Ui_FormFicha(object):
             self.FormLogin.show()
     
     def btn_reports_clicked(self):
-        from form_reports import Ui_FormReports                
+        from Reports import Ui_FormReports                
         self.FormReports = QtWidgets.QMainWindow()
         self.ui = Ui_FormReports()
         self.ui.setupUi(self.FormReports)
         self.FormReports.show()
 
     def btn_backups_clicked(self):
-        from form_backups import Ui_FormBackup
+        from Backups import Ui_FormBackup
         self.FormBackup = QtWidgets.QMainWindow()
         self.ui = Ui_FormBackup()
         self.ui.setupUi(self.FormBackup)
@@ -1026,7 +1031,7 @@ class Ui_FormFicha(object):
         if self.writing_interview:
             self.btn_new_interview_clicked()
         
-        if dao_assisted.id_gen_assisted() - 1 <= 0:
+        if assisted_controller.count_assisted() <= 0:
             self.empty_form()
         else:
             self.fill_form()
@@ -1047,21 +1052,23 @@ class Ui_FormFicha(object):
                 historic_message = ''                
                 
                 if self.adding == True and self.editing == False:
-                    self.get_values(a)
+                    self.get_values(assisted_model)
                     historic_message = 'ADICIONOU o registro de <{}>'.format(self.txt_name.text().strip().upper())
-                    dao_assisted.insert_assisted(a)
-                    dao_user.register_changes(u.name, historic_message)
-                    self.txt_index.setMaximum(dao_assisted.id_gen_assisted() - 1)
-                    self.adding = False      
+                    assisted_controller.insert_assisted(assisted_model)
+                    assisted_controller.register_changes(self.name, historic_message)
+                    
+                    self.txt_index.setMaximum(assisted_controller.count_assisted())
+                    self.txt_index.setMinimum(0)
+                    self.txt_index.setValue(assisted_controller.count_assisted())
+                                  
                 elif self.editing == True and self.adding == False:
                     self.save_changes()
-                    self.get_values(a)
-                    a.code = a.code - 1
-                    dao_assisted.edit_assisted(a)
+                    self.get_values(assisted_model)
+                    assisted_controller.update_assisted(assisted_model, self.index)
+                    
                     historic_message = 'EDITOU no registro de <{}>: '.format(self.txt_name.text().strip().upper())
                     historic_message += self.check_changes()   
-                    dao_user.register_changes(u.name, historic_message)
-                    self.editing = False
+                    assisted_controller.register_changes(self.name, historic_message)
                     self.fill_form()
                 
                 self.btn_cancel_clicked()
@@ -1069,24 +1076,25 @@ class Ui_FormFicha(object):
     def btn_delete_clicked(self):
         root = tkinter.Tk()
         root.withdraw()
-        choice = messagebox.askquestion('DELETAR REGISTRO', 'Deseja DELETAR o registro de <{}>?'.format(a.name))
+        choice = messagebox.askquestion('DELETAR REGISTRO', 'Deseja DELETAR o registro de <{}>?'.format(assisted_model.name))
         tkinter.Tk().destroy()
         
         if choice == 'yes':
             self.clear_table_view()
-            dao_assisted.delete_assisted(self.index)
-            historic_message = f'DELETOU o registro de <{a.name}>'
-            dao_user.register_changes(u.name, historic_message)
-            if dao_assisted.id_gen_assisted() - 1 == 0:
+            assisted_controller.delete_assisted(self.index)
+            historic_message = f'DELETOU o registro de <{assisted_model.name}>'
+            assisted_controller.register_changes(self.name, historic_message)
+            if assisted_controller.count_assisted() == 0:
                 self.txt_index.setMaximum(0)
                 self.txt_index.setMinimum(0)
                 self.empty_form()
                 self.action_buttons()
             else:
-                self.txt_index.setMaximum(dao_assisted.id_gen_assisted() - 1)
-                if self.index > dao_assisted.id_gen_assisted() - 1:
+                self.txt_index.setMaximum(assisted_controller.count_assisted())
+                
+                if self.index > assisted_controller.count_assisted():
                     self.index -= 1
-                elif self.index < dao_assisted.id_gen_assisted() - 1:
+                elif self.index < assisted_controller.count_assisted():
                     self.index += 1                    
                 else:
                     self.index = self.index
@@ -1116,18 +1124,18 @@ class Ui_FormFicha(object):
         self.btn_delete.setEnabled(False)
         
     def btn_print_clicked(self):
-        if dao_interview.count_interviews(a) > 2:
+        if assisted_controller.count_interviews(assisted_model) > 2:
             root = tkinter.Tk()
             root.withdraw()
             choice = messagebox.askquestion('IMPRESSÃO', 'Parece que esse registro possui três ou mais entrevistas.\nDeseja imprimir apenas as entrevistas mais recentes?')
             tkinter.Tk().destroy()
             
             if choice == 'yes':
-                dao_interview.print_interviews(a)
+                assisted_controller.print_interviews(assisted_model)
             else:
-                dao_assisted.print_register(a)
+                assisted_controller.print_register(assisted_model, self.index)
         else:
-            dao_assisted.print_register(a)
+            assisted_controller.print_register(assisted_model, self.index)
             
     def radio_addictions_no_toggled(self):
         if self.check_alcohol.isChecked():
@@ -1165,9 +1173,11 @@ class Ui_FormFicha(object):
 
     def btn_new_interview_clicked(self):
         self.tb_interviews.setEnabled(False)
+        
+        
         if not self.writing_interview:
             new_icon = QtGui.QIcon()
-            new_icon.addPixmap(QtGui.QPixmap("images/x-circle.svg"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+            new_icon.addPixmap(QtGui.QPixmap("assets/x-circle.svg"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
             self.btn_new_interview.setIcon(new_icon)
             self.btn_new_interview.setText('CANCELAR')
             
@@ -1179,20 +1189,21 @@ class Ui_FormFicha(object):
             self.tab_fowarding.setEnabled(False)
             self.tab_guidance.setEnabled(False)
 
-            # self.txt_interviewer.setReadOnly(False)
+            self.txt_interviewer.setReadOnly(False)
             self.cmb_treatment.setEnabled(True)
             self.txt_interview.setReadOnly(False)
             self.btn_save_interview.setEnabled(True)
             self.btn_new_interview.setEnabled(True)
             
-            self.txt_interview.setFocus(True)
-            self.txt_interviewer.setText(u.name)
+            self.txt_interviewer.setFocus(True)
+            self.txt_interviewer.setText(self.name)
             self.txt_interview.setText('')
 
             self.writing_interview = True
+
         else:
             new_icon = QtGui.QIcon()
-            new_icon.addPixmap(QtGui.QPixmap("images/edit-3.svg"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+            new_icon.addPixmap(QtGui.QPixmap("assets/edit-3.svg"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
             self.btn_new_interview.setIcon(new_icon)
             self.btn_new_interview.setText('NOVA ENTREVISTA')
             
@@ -1217,7 +1228,8 @@ class Ui_FormFicha(object):
             root = tkinter.Tk()
             root.withdraw()
             messagebox.showerror('ERRO', 'Os campos ENTREVISTADOR e ENTREVISTA precisam estar PREENCHIDOS')        
-            tkinter.Tk().destroy()        
+            tkinter.Tk().destroy()  
+                  
         else:
             root = tkinter.Tk()
             root.withdraw()
@@ -1228,15 +1240,15 @@ class Ui_FormFicha(object):
                 from datetime import datetime            
                 today = datetime.now().strftime('%d/%m/%Y')
                 
-                i.code = dao_interview.id_gen_interview()
-                i.date = today
-                i.interviewer = self.txt_interviewer.text().strip().upper()
-                i.treatment = self.cmb_treatment.currentText()
-                i.interview = self.txt_interview.toPlainText().strip()
+                interview_model.code = ''.join(random.choices(string.ascii_lowercase + string.digits, k=8))
+                interview_model.date = today
+                interview_model.interviewer = self.txt_interviewer.text().strip().upper()
+                interview_model.treatment = self.cmb_treatment.currentText()
+                interview_model.interview = self.txt_interview.toPlainText().strip()
                 
-                dao_interview.insert_interview(i, a)
+                assisted_controller.insert_interview(interview_model, assisted_model)
                 historic_message = 'Adicionou uma ENTREVISTA ao registro de <{}>'.format(self.txt_name.text().strip().upper())
-                dao_user.register_changes(u.name, historic_message)                
+                assisted_controller.register_changes(self.name, historic_message)                
                 self.btn_new_interview_clicked()
                 self.clear_table_view()
                 self.fill_table_view()                                
@@ -1292,7 +1304,7 @@ class Ui_FormFicha(object):
         font.setWeight(75)
         self.btn_add.setFont(font)
         icon = QtGui.QIcon()
-        icon.addPixmap(QtGui.QPixmap("images/plus-circle.svg"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        icon.addPixmap(QtGui.QPixmap("assets/plus-circle.svg"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
         self.btn_add.setIcon(icon)
         self.btn_add.setObjectName("btn_add")
         self.gridLayout_3.addWidget(self.btn_add, 0, 0, 1, 1)
@@ -1304,7 +1316,7 @@ class Ui_FormFicha(object):
         font.setWeight(75)
         self.btn_save.setFont(font)
         icon1 = QtGui.QIcon()
-        icon1.addPixmap(QtGui.QPixmap("images/save.svg"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        icon1.addPixmap(QtGui.QPixmap("assets/save.svg"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
         self.btn_save.setIcon(icon1)
         self.btn_save.setObjectName("btn_save")
         self.gridLayout_3.addWidget(self.btn_save, 0, 1, 1, 1)
@@ -1316,7 +1328,7 @@ class Ui_FormFicha(object):
         font.setWeight(75)
         self.btn_cancel.setFont(font)
         icon2 = QtGui.QIcon()
-        icon2.addPixmap(QtGui.QPixmap("images/x-circle.svg"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        icon2.addPixmap(QtGui.QPixmap("assets/x-circle.svg"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
         self.btn_cancel.setIcon(icon2)
         self.btn_cancel.setObjectName("btn_cancel")
         self.gridLayout_3.addWidget(self.btn_cancel, 0, 2, 1, 1)
@@ -1328,7 +1340,7 @@ class Ui_FormFicha(object):
         font.setWeight(75)
         self.btn_edit.setFont(font)
         icon3 = QtGui.QIcon()
-        icon3.addPixmap(QtGui.QPixmap("images/edit.svg"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        icon3.addPixmap(QtGui.QPixmap("assets/edit.svg"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
         self.btn_edit.setIcon(icon3)
         self.btn_edit.setObjectName("btn_edit")
         self.gridLayout_3.addWidget(self.btn_edit, 1, 0, 1, 1)
@@ -1340,7 +1352,7 @@ class Ui_FormFicha(object):
         font.setWeight(75)
         self.btn_delete.setFont(font)
         icon4 = QtGui.QIcon()
-        icon4.addPixmap(QtGui.QPixmap("images/trash.svg"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        icon4.addPixmap(QtGui.QPixmap("assets/trash.svg"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
         self.btn_delete.setIcon(icon4)
         self.btn_delete.setObjectName("btn_delete")
         self.gridLayout_3.addWidget(self.btn_delete, 1, 1, 1, 1)
@@ -1352,7 +1364,7 @@ class Ui_FormFicha(object):
         font.setWeight(75)
         self.btn_print.setFont(font)
         icon5 = QtGui.QIcon()
-        icon5.addPixmap(QtGui.QPixmap("images/printer.svg"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        icon5.addPixmap(QtGui.QPixmap("assets/printer.svg"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
         self.btn_print.setIcon(icon5)
         self.btn_print.setObjectName("btn_print")
         self.gridLayout_3.addWidget(self.btn_print, 1, 2, 1, 1)
@@ -1364,7 +1376,7 @@ class Ui_FormFicha(object):
         font.setWeight(75)
         self.btn_report.setFont(font)
         icon6 = QtGui.QIcon()
-        icon6.addPixmap(QtGui.QPixmap("images/file-text.svg"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        icon6.addPixmap(QtGui.QPixmap("assets/file-text.svg"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
         self.btn_report.setIcon(icon6)
         self.btn_report.setObjectName("btn_report")
         self.gridLayout_3.addWidget(self.btn_report, 2, 0, 1, 1)
@@ -1376,7 +1388,7 @@ class Ui_FormFicha(object):
         font.setWeight(75)
         self.btn_backups.setFont(font)
         icon7 = QtGui.QIcon()
-        icon7.addPixmap(QtGui.QPixmap("images/database.svg"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        icon7.addPixmap(QtGui.QPixmap("assets/database.svg"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
         self.btn_backups.setIcon(icon7)
         self.btn_backups.setObjectName("btn_backups")
         self.gridLayout_3.addWidget(self.btn_backups, 2, 1, 1, 1)
@@ -1388,7 +1400,7 @@ class Ui_FormFicha(object):
         font.setWeight(75)
         self.btn_log_out.setFont(font)
         icon8 = QtGui.QIcon()
-        icon8.addPixmap(QtGui.QPixmap("images/log-out.svg"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        icon8.addPixmap(QtGui.QPixmap("assets/log-out.svg"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
         self.btn_log_out.setIcon(icon8)
         self.btn_log_out.setObjectName("btn_log_out")
         self.gridLayout_3.addWidget(self.btn_log_out, 2, 2, 1, 1)
@@ -1714,7 +1726,7 @@ class Ui_FormFicha(object):
         self.txt_city.setObjectName("txt_city")
         self.gridLayout_4.addWidget(self.txt_city, 7, 2, 1, 5)
         icon9 = QtGui.QIcon()
-        icon9.addPixmap(QtGui.QPixmap("images/user.svg"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        icon9.addPixmap(QtGui.QPixmap("assets/user.svg"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
         self.tabWidget.addTab(self.tab_personal_data, icon9, "")
         self.tab_extra_info = QtWidgets.QWidget()
         self.tab_extra_info.setObjectName("tab_extra_info")
@@ -2303,7 +2315,7 @@ class Ui_FormFicha(object):
         self.verticalLayout_2.addWidget(self.radio_medical_treatment_no)
         self.gridLayout_5.addWidget(self.groupBox_5, 0, 2, 1, 3)
         icon10 = QtGui.QIcon()
-        icon10.addPixmap(QtGui.QPixmap("images/user-plus.svg"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        icon10.addPixmap(QtGui.QPixmap("assets/user-plus.svg"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
         self.tabWidget.addTab(self.tab_extra_info, icon10, "")
         self.tab_fowarding = QtWidgets.QWidget()
         self.tab_fowarding.setObjectName("tab_fowarding")
@@ -2458,7 +2470,7 @@ class Ui_FormFicha(object):
         self.verticalLayout_4.addWidget(self.check_philosophy)
         self.gridLayout_6.addWidget(self.groupBox_13, 0, 1, 1, 1)
         icon11 = QtGui.QIcon()
-        icon11.addPixmap(QtGui.QPixmap("images/arrow-right.svg"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        icon11.addPixmap(QtGui.QPixmap("assets/arrow-right.svg"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
         self.tabWidget.addTab(self.tab_fowarding, icon11, "")
         self.tab_guidance = QtWidgets.QWidget()
         self.tab_guidance.setObjectName("tab_guidance")
@@ -2682,7 +2694,7 @@ class Ui_FormFicha(object):
         self.verticalLayout_5.addWidget(self.check_no_pass)
         self.gridLayout_7.addWidget(self.groupBox_17, 0, 1, 4, 1)
         icon12 = QtGui.QIcon()
-        icon12.addPixmap(QtGui.QPixmap("images/compass.svg"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        icon12.addPixmap(QtGui.QPixmap("assets/compass.svg"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
         self.tabWidget.addTab(self.tab_guidance, icon12, "")
         self.tab_interviews = QtWidgets.QWidget()
         self.tab_interviews.setObjectName("tab_interviews")
@@ -2780,7 +2792,7 @@ class Ui_FormFicha(object):
         self.gridLayout_17.addWidget(self.tb_interviews, 0, 0, 1, 1)
         self.gridLayout_8.addWidget(self.groupBox_12, 0, 1, 1, 1)
         icon13 = QtGui.QIcon()
-        icon13.addPixmap(QtGui.QPixmap("images/file-text.svg"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        icon13.addPixmap(QtGui.QPixmap("assets/file-text.svg"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
         self.tabWidget.addTab(self.tab_interviews, icon13, "")
         self.gridLayout.addWidget(self.tabWidget, 1, 0, 1, 2)
         FormFicha.setCentralWidget(self.centralwidget)
@@ -2804,14 +2816,13 @@ class Ui_FormFicha(object):
         self.radio_addiction_yes.clicked.connect(self.radio_addictions_yes_toggled)
         self.radio_addiction_no.clicked.connect(self.radio_addictions_no_toggled)        
 
-        self.get_user()
-        
+        self.get_user()        
         self.enable_read_only()
 
-        if dao_assisted.id_gen_assisted() - 1 != 0:
-            self.txt_index.setValue(dao_assisted.id_gen_assisted() - 1)
+        if assisted_controller.count_assisted() > 0:
+            self.txt_index.setValue(assisted_controller.count_assisted())
             self.txt_index.setMinimum(1)
-            self.txt_index.setMaximum(dao_assisted.id_gen_assisted() - 1)
+            self.txt_index.setMaximum(assisted_controller.count_assisted())
             self.fill_form()
         else:
             self.empty_form()

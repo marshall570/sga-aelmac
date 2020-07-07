@@ -1,4 +1,4 @@
-class Interview:
+class InterviewModel:
     def __init__(self, code = None, date = None, interviewer = None, treatment = None, interview = None):
         self.code = code
         self.date = date

@@ -2,11 +2,11 @@
 import tkinter
 from PyQt5 import QtCore, QtGui, QtWidgets
 from tkinter import messagebox
-from dao_assisted import DAOAssisted
-from dao_user import DAOUser
+from AssistedController import AssistedController
+from LoginController import LoginController
 
-dao_assisted = DAOAssisted()
-dao_user = DAOUser()
+assisted_controller = AssistedController()
+user_controller = LoginController()
 
 class Ui_FormBackup(object):
     password_visible = False
@@ -15,13 +15,13 @@ class Ui_FormBackup(object):
         if self.password_visible is True:
             self.txt_password.setEchoMode(QtWidgets.QLineEdit.Password)
             icon = QtGui.QIcon()
-            icon.addPixmap(QtGui.QPixmap("images/eye-off.svg"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+            icon.addPixmap(QtGui.QPixmap("assets/eye-off.svg"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
             self.btn_show_password.setIcon(icon)
             self.password_visible = False
         else:
             self.txt_password.setEchoMode(QtWidgets.QLineEdit.Normal)
             icon = QtGui.QIcon()
-            icon.addPixmap(QtGui.QPixmap("images/eye.svg"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+            icon.addPixmap(QtGui.QPixmap("assets/eye.svg"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
             self.btn_show_password.setIcon(icon)
             self.password_visible = True    
         
@@ -30,24 +30,24 @@ class Ui_FormBackup(object):
         user = self.txt_user.text().strip()
         password = self.txt_password.text().strip()        
         
-        if dao_user.count_user(user) < 1:
+        if user_controller.count_user(user) < 1:
             root = tkinter.Tk()
             root.withdraw()
             messagebox.showerror('ERRO', 'ERRO!!! O Usuário informado não existe.\nTente outro usuário')
             tkinter.Tk().destroy()
         else:       
             historic_message = ''     
-            active_user = dao_user.select_active_user()
+            active_user = assisted_controller.select_active_user()
             
             if self.radio_export.isChecked():
-                if password == dao_user.select_user(user)[1]:
+                if password == user_controller.select_user(user)[1]:
                     if user == active_user[1]:
                         historic_message = 'EXPORTOU dados utilizando o próprio login'
                     else:
                         historic_message = f'EXPORTOU dados utilizando o login <{user}>'
                         
-                    dao_assisted.export_data()
-                    dao_user.register_changes(active_user[0], historic_message)
+                    assisted_controller.export_data()
+                    assisted_controller.register_changes(active_user[0], historic_message)
                     this_window.close()
                 else:
                     root = tkinter.Tk()
@@ -55,13 +55,13 @@ class Ui_FormBackup(object):
                     messagebox.showerror('ERRO', 'ERRO!!! A senha para o usuário <{}> está incorreta'.format(user))
                     tkinter.Tk().destroy()                    
             else:                             
-                if dao_user.select_user(user)[2] != 'ADMINISTRADOR':
+                if user_controller.select_user(user)[2] != 'ADMINISTRADOR':
                     root = tkinter.Tk()
                     root.withdraw()
                     messagebox.showerror('ERRO', 'ERRO!!! Apenas usuários com categoria ADMINISTRADOR podem IMPORTAR dados.\nInsira um usuário com a categoria de <ADMINISTRADOR> e tente novamente.')
                     tkinter.Tk().destroy()
                 else:                    
-                    if password == dao_user.select_user(user)[1]:
+                    if password == user_controller.select_user(user)[1]:
                         import platform
                         import os
                         path = ''
@@ -86,9 +86,9 @@ class Ui_FormBackup(object):
                                 else:
                                     historic_message = f'IMPORTOU dados utilizando o login de {active_user[0]}'                            
 
-                                dao_user.register_changes(active_user[0], historic_message)
-                                dao_user.gen_historic()
-                                dao_assisted.import_data(file[0])
+                                assisted_controller.register_changes(active_user[0], historic_message)
+                                assisted_controller.gen_historic()
+                                assisted_controller.import_data(file[0])
                                 QtWidgets.QApplication.quit()
                     else:
                         root = tkinter.Tk()
@@ -103,7 +103,7 @@ class Ui_FormBackup(object):
         FormBackup.resize(500, 405)
         FormBackup.setMaximumSize(QtCore.QSize(500, 405))
         icon = QtGui.QIcon()
-        icon.addPixmap(QtGui.QPixmap("images/aelmac_white.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        icon.addPixmap(QtGui.QPixmap("assets/aelmac_white.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
         FormBackup.setWindowIcon(icon)
         self.centralwidget = QtWidgets.QWidget(FormBackup)
         self.centralwidget.setObjectName("centralwidget")
@@ -169,7 +169,7 @@ class Ui_FormBackup(object):
         self.btn_show_password.setGeometry(QtCore.QRect(430, 150, 32, 32))
         self.btn_show_password.setText("")
         icon1 = QtGui.QIcon()
-        icon1.addPixmap(QtGui.QPixmap("images/eye-off.svg"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        icon1.addPixmap(QtGui.QPixmap("assets/eye-off.svg"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
         self.btn_show_password.setIcon(icon1)
         self.btn_show_password.setFlat(True)
         self.btn_show_password.setObjectName("btn_show_password")
@@ -183,13 +183,13 @@ class Ui_FormBackup(object):
         font.setWeight(75)
         self.btn_execute.setFont(font)
         icon2 = QtGui.QIcon()
-        icon2.addPixmap(QtGui.QPixmap("images/database.svg"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        icon2.addPixmap(QtGui.QPixmap("assets/database.svg"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
         self.btn_execute.setIcon(icon2)
         self.btn_execute.setObjectName("btn_execute")
         self.btn_execute.clicked.connect(self.btn_execute_clicked)
         FormBackup.setCentralWidget(self.centralwidget)    
         
-        if dao_assisted.id_gen_assisted() - 1 < 1:
+        if assisted_controller.count_assisted() < 1:
             self.radio_export.setEnabled(False)
             self.radio_import.setEnabled(True)
         else:

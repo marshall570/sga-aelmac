@@ -2,9 +2,9 @@
 import tkinter
 from PyQt5 import QtCore, QtGui, QtWidgets
 from tkinter import messagebox
-from dao_assisted import DAOAssisted
+from AssistedController import AssistedController
 
-dao_assisted = DAOAssisted()
+controller = AssistedController()
 
 class Ui_FormReports(object):
     selected_filter = 'Nome'
@@ -77,14 +77,14 @@ class Ui_FormReports(object):
             count_sql = "SELECT COUNT(*) FROM tb_assistidos WHERE {} LIKE '%{}%'".format(self.selected_filter, value)
             self.custom_sql = "SELECT * FROM tb_assistidos WHERE {} LIKE '%{}%'".format(self.selected_filter, value)
             
-            if dao_assisted.count_custom_search(count_sql) < 1:
+            if controller.count_custom_search(count_sql) < 1:
                 root = tkinter.Tk()
                 root.withdraw()
                 messagebox.showinfo('RESULTADO NÃO ENCONTRADO', 'Não foram encontrados resultados com os filtros especificados.\nTente novamente com outros filtros.')
                 tkinter.Tk().destroy()
             else:
                 self.model.removeRows(0, self.model.rowCount())                
-                query_result = dao_assisted.custom_search(self.custom_sql)
+                query_result = controller.custom_search(self.custom_sql)
                 
                 for value in query_result:
                     row = []
@@ -96,7 +96,7 @@ class Ui_FormReports(object):
                 self.btn_export.setEnabled(True)
                 
     def btn_export_clicked(self):
-        dao_assisted.gen_custom_csv(self.custom_sql, self.selected_filter)
+        controller.gen_custom_csv(self.custom_sql, self.selected_filter)
             
     
     def setupUi(self, FormReports):
@@ -104,7 +104,7 @@ class Ui_FormReports(object):
         FormReports.resize(650, 450)
         FormReports.setMaximumSize(QtCore.QSize(650, 450))
         icon = QtGui.QIcon()
-        icon.addPixmap(QtGui.QPixmap("images/aelmac_white.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        icon.addPixmap(QtGui.QPixmap("assets/aelmac_white.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
         FormReports.setWindowIcon(icon)
         self.centralwidget = QtWidgets.QWidget(FormReports)
         self.centralwidget.setObjectName("centralwidget")
@@ -158,7 +158,7 @@ class Ui_FormReports(object):
         self.tb_results = QtWidgets.QTableView(self.groupBox_2)
         self.tb_results.setGeometry(QtCore.QRect(10, 30, 611, 241))
         self.model = QtGui.QStandardItemModel(self.groupBox_2)
-        self.model.setHorizontalHeaderLabels(['ID', 'NOME', 'DATA DE NASCIMENTO', 'TELEFONE (CELULAR)', 'TELEFONE (RESIDENCIAL)', 'GÊNERO', 'ESTADO CIVIL', 'OCUPAÇÃO', 'RESIDE COM', 'ENDEREÇO', 'BAIRRO', 'NÚMERO', 'CIDADE', 'ESTADO', 'TOMA SEDATIVOS?', 'TRATAMENTO MÉDICO?', 'DROME BEM?', 'VÍCIOS', 'SONHOS', 'TRABALHO', 'FAMÍLIA', 'ALIMENTAÇÃO', 'INFO PARA O DEPOE', 'ÚLTIMO TRATAMENTO', 'CURSOS E FREQUÊNCIA', 'ENCAMINHAMENTO', 'TRATAMENTOS', 'ORIENTAÇÃO ESPIRITUAL'])
+        self.model.setHorizontalHeaderLabels(['SERIAL', 'POSICAO', 'NOME', 'DATA DE NASCIMENTO', 'TELEFONE (CELULAR)', 'TELEFONE (RESIDENCIAL)', 'GÊNERO', 'ESTADO CIVIL', 'OCUPAÇÃO', 'RESIDE COM', 'ENDEREÇO', 'BAIRRO', 'NÚMERO', 'CIDADE', 'ESTADO', 'TOMA SEDATIVOS?', 'TRATAMENTO MÉDICO?', 'DROME BEM?', 'VÍCIOS', 'SONHOS', 'TRABALHO', 'FAMÍLIA', 'ALIMENTAÇÃO', 'INFO PARA O DEPOE', 'ÚLTIMO TRATAMENTO', 'CURSOS E FREQUÊNCIA', 'ENCAMINHAMENTO', 'TRATAMENTOS', 'ORIENTAÇÃO ESPIRITUAL'])
         self.tb_results.setEditTriggers(QtWidgets.QAbstractItemView.NoEditTriggers)
         self.tb_results.setSelectionBehavior(QtWidgets.QAbstractItemView.SelectRows)
         self.tb_results.setSelectionMode(QtWidgets.QAbstractItemView.SingleSelection)
@@ -179,7 +179,7 @@ class Ui_FormReports(object):
         self.btn_search.setFont(font)
         self.btn_search.setEnabled(True)
         icon1 = QtGui.QIcon()
-        icon1.addPixmap(QtGui.QPixmap("images/search.svg"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        icon1.addPixmap(QtGui.QPixmap("assets/search.svg"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
         self.btn_search.setIcon(icon1)
         self.btn_search.setObjectName("btn_search")
         self.btn_search.clicked.connect(self.btn_search_clicked)
@@ -192,7 +192,7 @@ class Ui_FormReports(object):
         self.btn_export.setFont(font)
         self.btn_export.setEnabled(False)
         icon1 = QtGui.QIcon()
-        icon1.addPixmap(QtGui.QPixmap("images/file-text.svg"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        icon1.addPixmap(QtGui.QPixmap("assets/file-text.svg"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
         self.btn_export.setIcon(icon1)
         self.btn_export.setObjectName("btn_export")
         self.btn_export.clicked.connect(self.btn_export_clicked)

@@ -1,7 +1,8 @@
 # -*- coding: utf-8 -*-
-class Assisted:
-    def __init__(self, code = None, name = None, date_of_birth = None, phone1 = None, phone2 = None, gender = None, civil_state = None, ocupation = None, lives_with = None, address = None, neighbourhood = None, number = None, city = None, state = None, sedatives = None, medical_treatment = None, sleep_well = None, addictions = None, dreams = None, work = None, family = None, feeding = None, traits = None, latest_treatment = None, courses = None, fowarding = None, treatment = None, guidance = None):
-        self.code = code
+class AssistedModel:
+    def __init__(self, serial = None, position = None, name = None, date_of_birth = None, phone1 = None, phone2 = None, gender = None, civil_state = None, ocupation = None, lives_with = None, address = None, neighbourhood = None, number = None, city = None, state = None, sedatives = None, medical_treatment = None, sleep_well = None, addictions = None, dreams = None, work = None, family = None, feeding = None, traits = None, latest_treatment = None, courses = None, fowarding = None, treatment = None, guidance = None):
+        self.serial = serial
+        self.position = position
         self.name = name
         self.date_of_birth = date_of_birth
         self.phone1 = phone1
@@ -32,11 +33,18 @@ class Assisted:
 
         
     @property
-    def code(self):
-        return self._code
-    @code.setter
-    def code(self, code):
-        self._code = code
+    def serial(self):
+        return self._serial
+    @serial.setter
+    def serial(self, serial):
+        self._serial = serial
+    
+    @property
+    def position(self):
+        return self._position
+    @position.setter
+    def position(self, position):
+        self._position = position
     
     
     @property

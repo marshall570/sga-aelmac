@@ -1,94 +1,83 @@
 # -*- coding: utf-8 -*-
-import sqlite3 as sql
 import tkinter
-import fpdf
-from tkinter import messagebox
-from database import Data
 import platform
 import os
+import fpdf
+from tkinter import messagebox
+from Connection import Database
 
-db = Data()
+db = Database()
 
-class DAOInterview:
-    def create_table_interview(self):
-        try:
-            table_sql = 'CREATE TABLE IF NOT EXISTS tb_entrevistas (id_entrevista INTEGER NOT NULL PRIMARY KEY, id_assistido INTEGER NOT NULL, Data_da_entrevista TEXT, Entrevistador TEXT, Tratamento TEXT, Entrevista TEXT, FOREIGN KEY (id_assistido) REFERENCES tb_assistidos (id_assistido))'
-            
-            conn = db.create_connection()
-            cursor = conn.cursor()
-            cursor.execute(table_sql)
-        except sql.Error as e:
-            print(e)
-        finally:
-            db.close_connection(conn, cursor)
 
-    
-    def id_gen_interview(self):
+class InterviewController:   
+    def count_interviews(self, index):
         try:
             conn = db.create_connection()
             cursor = conn.cursor()
-            rs = cursor.execute('SELECT COUNT(*) FROM tb_entrevistas').fetchone()[0] + 1
+            rs = cursor.execute(f'SELECT COUNT(*) FROM tb_entrevistas WHERE Posicao = {index}').fetchone()[0]
             return rs
-        except sql.Error as e:
-            print(e)
-        finally:
-            db.close_connection(conn, cursor)
-
-
-    def count_interviews(self, a):
-        try:
-            conn = db.create_connection()
-            cursor = conn.cursor()
-            rs = cursor.execute(f'SELECT COUNT(*) FROM tb_entrevistas WHERE id_assistido = {a.code}').fetchone()[0]
-            return rs
-        except sql.Error as e:
-            print(e)
+        
+        except Exception as e:
+            root = tkinter.Tk()
+            root.withdraw()
+            messagebox.showerror('ERRO', e)
+            tkinter.Tk().destroy()
+        
         finally:
             db.close_connection(conn, cursor)
             
     
     def insert_interview(self, i, a):
         try:
-            sql_string = "INSERT INTO tb_entrevistas VALUES ({}, {}, '{}', '{}', '{}', '{}')".format(i.code, a.code, i.date, i.interviewer, i.treatment, i.interview)
+            sql_string = "INSERT INTO tb_entrevistas VALUES ({}, {}, '{}', '{}', '{}', '{}')".format(i.code, a.serial, i.date, i.interviewer, i.treatment, i.interview)
             conn = db.create_connection()
             cursor = conn.cursor()
             cursor.execute(sql_string)
             conn.commit()
 
-            sql_string = "UPDATE tb_assistidos SET Ultimo_tratamento = '{}' WHERE id_assistido = {}".format(i.treatment, a.code)
+            sql_string = "UPDATE tb_assistidos SET Ultimo_tratamento = '{}' WHERE Serial = {}".format(i.treatment, a.serial)
             cursor.execute(sql_string)
             conn.commit()
 
             root = tkinter.Tk()
             root.withdraw()
             messagebox.showinfo('CADASTRADO', 'Entrevista registrada com sucesso!')     
-            tkinter.Tk().destroy()        
-        except sql.Error as e:
-            print(e)
+            tkinter.Tk().destroy()
+                   
+        except Exception as e:
+            root = tkinter.Tk()
+            root.withdraw()
+            messagebox.showerror('ERRO', e)
+            tkinter.Tk().destroy()
+        
         finally:
             db.close_connection(conn, cursor)
             
             
-    def select_interview(self, a):
-        try:
-            select_string = 'SELECT Data_da_entrevista, Entrevistador, Tratamento, Entrevista FROM tb_entrevistas WHERE id_assistido = ' + str(a.code)
-            
+    def select_interview(self, index):
+        try:            
             conn = db.create_connection()
             cursor = conn.cursor()
-            rs = cursor.execute(select_string).fetchall()
+            rs = cursor.execute(f'SELECT Data_da_entrevista, Entrevistador, Tratamento, Entrevista FROM tb_entrevistas WHERE Posicao = {index}').fetchall()
             return rs
-        except sql.Error as e:
-            print(e)
+        
+        except Exception as e:
+            root = tkinter.Tk()
+            root.withdraw()
+            messagebox.showerror('ERRO', e)
+            tkinter.Tk().destroy()
+        
         finally:
             db.close_connection(conn, cursor)
   
         
     def print_interviews(self, a):
         try:            
-            conn = db.create_connection()
+            sql_string = f"SELECT Data_da_entrevista, Entrevistador, Tratamento, Entrevista FROM tb_entrevistas WHERE id_assistido = {a.serial} ORDER BY id_entrevista DESC LIMIT 3"
             
-            sql_string = f"SELECT Data_da_entrevista, Entrevistador, Tratamento, Entrevista FROM tb_entrevistas WHERE id_assistido = {a.code} ORDER BY id_entrevista DESC LIMIT 3"
-            query = list(conn.execute(sql_string).fetchall())                                       
+            conn = db.create_connection()
+            cursor = conn.cursor()
+            query = cursor.execute(sql_string).fetchall()
                 
             pdf = fpdf.FPDF(format='A4')
             pdf.add_page()
@@ -121,7 +110,13 @@ class DAOInterview:
             root.withdraw()
             messagebox.showinfo('GERAR FICHA', 'Ficha para impressão gerada com sucesso para a pasta <FICHAS_INDIVIDUAIS>!')
             tkinter.Tk().destroy()
-        except sql.Error as e:
-            print(e)
+            
+        except Exception as e:
+            root = tkinter.Tk()
+            root.withdraw()
+            messagebox.showerror('ERRO', e)
+            tkinter.Tk().destroy()
+        
         finally:
             db.close_connection(conn)
+            

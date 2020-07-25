@@ -196,7 +196,7 @@ class AssistedController:
             #         item = ''
             #     results.append(str(item))
                     
-            fields = ['ID', 'Nome do Assistido', 'Data de Nascimento', 'Telefone (Celular)', 'Telefone (Residencial)', 'Gênero', 'Estado Civil', 'Ocupação', 'Reside Com', 'Endereço', 'Bairro', 'Número', 'Cidade', 'Estado', 'Toma sedativos', 'Tratamento médico', 'Dorme bem', 'Vícios', 'Sonhos', 'Trabalho', 'Família', 'Alimentação', 'Info para DEPOE', 'Último Tratamento','Frequência - Cursos', 'Encaminhamento', 'Tratamentos', 'Orientação']
+            fields = ['SERIAL', 'ID', 'Nome do Assistido', 'Data de Nascimento', 'Telefone (Celular)', 'Telefone (Residencial)', 'Gênero', 'Estado Civil', 'Ocupação', 'Reside Com', 'Endereço', 'Bairro', 'Número', 'Cidade', 'Estado', 'Toma sedativos', 'Tratamento médico', 'Dorme bem', 'Vícios', 'Sonhos', 'Trabalho', 'Família', 'Alimentação', 'Info para DEPOE', 'Último Tratamento','Frequência - Cursos', 'Encaminhamento', 'Tratamentos', 'Orientação']
             
             pdf = fpdf.FPDF(format='A4')
             pdf.add_page()
@@ -407,12 +407,11 @@ class AssistedController:
         
         finally:
             db.close_connection(conn)
-            
-            
+                        
     def count_interviews(self, a):
         try:
             conn = db.create_connection()
-            cursor = conn.cursor()
+            cursor = conn.cursor()            
             rs = cursor.execute(f'SELECT COUNT(*) FROM tb_entrevistas WHERE id_assistido = \'{a.serial}\'').fetchone()[0]
             return rs
         
@@ -458,7 +457,6 @@ class AssistedController:
             cursor = conn.cursor()
             rs = cursor.execute(f"SELECT Data_da_entrevista, Entrevistador, Tratamento, Entrevista FROM tb_entrevistas WHERE id_assistido = '{a.serial}'").fetchall()
             
-            print(a.serial)
             return rs
         
         except Exception as e:
@@ -473,7 +471,7 @@ class AssistedController:
         
     def print_interviews(self, a):
         try:            
-            sql_string = f"SELECT Data_da_entrevista, Entrevistador, Tratamento, Entrevista FROM tb_entrevistas WHERE id_assistido = {a.serial} ORDER BY id_entrevista DESC LIMIT 3"
+            sql_string = f'SELECT Data_da_entrevista, Entrevistador, Tratamento, Entrevista FROM tb_entrevistas WHERE id_assistido = \'{a.serial}\' ORDER BY id_entrevista DESC LIMIT 3'
             
             conn = db.create_connection()
             cursor = conn.cursor()

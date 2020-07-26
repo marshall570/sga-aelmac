@@ -187,14 +187,7 @@ class AssistedController:
         try:            
             conn = db.create_connection()
             cursor = conn.cursor()
-            query = cursor.execute(f'SELECT * FROM tb_assistidos WHERE Posicao = {index}').fetchone()                              
-            
-            # results = []
-            
-            # for item in query:
-            #     if item == None:
-            #         item = ''
-            #     results.append(str(item))
+            query = cursor.execute(f'SELECT * FROM tb_assistidos WHERE Posicao = {index}').fetchone()                                        
                     
             fields = ['SERIAL', 'ID', 'Nome do Assistido', 'Data de Nascimento', 'Telefone (Celular)', 'Telefone (Residencial)', 'Gênero', 'Estado Civil', 'Ocupação', 'Reside Com', 'Endereço', 'Bairro', 'Número', 'Cidade', 'Estado', 'Toma sedativos', 'Tratamento médico', 'Dorme bem', 'Vícios', 'Sonhos', 'Trabalho', 'Família', 'Alimentação', 'Info para DEPOE', 'Último Tratamento','Frequência - Cursos', 'Encaminhamento', 'Tratamentos', 'Orientação']
             
@@ -332,7 +325,6 @@ class AssistedController:
     
                               
     def import_data(self, file):        
-        # os.remove('sga_database.db')            
         shutil.copyfile(file, 'sga_database.db')
                     
         root = tkinter.Tk()

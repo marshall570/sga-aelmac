@@ -196,7 +196,7 @@ class AssistedController:
             #         item = ''
             #     results.append(str(item))
                     
-            fields = ['ID', 'Nome do Assistido', 'Data de Nascimento', 'Telefone (Celular)', 'Telefone (Residencial)', 'Gênero', 'Estado Civil', 'Ocupação', 'Reside Com', 'Endereço', 'Bairro', 'Número', 'Cidade', 'Estado', 'Toma sedativos', 'Tratamento médico', 'Dorme bem', 'Vícios', 'Sonhos', 'Trabalho', 'Família', 'Alimentação', 'Info para DEPOE', 'Último Tratamento','Frequência - Cursos', 'Encaminhamento', 'Tratamentos', 'Orientação']
+            fields = ['SERIAL', 'ID', 'Nome do Assistido', 'Data de Nascimento', 'Telefone (Celular)', 'Telefone (Residencial)', 'Gênero', 'Estado Civil', 'Ocupação', 'Reside Com', 'Endereço', 'Bairro', 'Número', 'Cidade', 'Estado', 'Toma sedativos', 'Tratamento médico', 'Dorme bem', 'Vícios', 'Sonhos', 'Trabalho', 'Família', 'Alimentação', 'Info para DEPOE', 'Último Tratamento','Frequência - Cursos', 'Encaminhamento', 'Tratamentos', 'Orientação']
             
             pdf = fpdf.FPDF(format='A4')
             pdf.add_page()
@@ -235,9 +235,9 @@ class AssistedController:
                     i += 1                                    
             
             if platform.system() == 'Linux':
-                pdf.output(os.path.expanduser("~") + '/Documentos/GERENCIAMENTO_DE_ASSISTIDOS_AELMAC/FICHAS_INDIVIDUAIS/Ficha_de_assistido-' + query[2] + '.pdf')
+                pdf.output(os.path.expanduser('~') + '/Documentos/GERENCIAMENTO_DE_ASSISTIDOS_AELMAC/FICHAS_INDIVIDUAIS/Ficha_de_assistido-' + query[2] + '.pdf')
             else:                    
-                pdf.output(os.path.expanduser("~") + '\\Documents\\GERENCIAMENTO_DE_ASSISTIDOS_AELMAC\\FICHAS_INDIVIDUAIS\\Ficha_de_assistido-' + query[2] + '.pdf')
+                pdf.output(os.path.expanduser('~') + '\\Documents\\GERENCIAMENTO_DE_ASSISTIDOS_AELMAC\\FICHAS_INDIVIDUAIS\\Ficha_de_assistido-' + query[2] + '.pdf')
 
 
             root = tkinter.Tk()
@@ -291,15 +291,15 @@ class AssistedController:
    
     def gen_custom_csv(self, custom_string, selected_filter):
         try:            
-            today = datetime.datetime.now().strftime("%d-%m-%y")            
+            today = datetime.datetime.now().strftime('%d-%m-%y')            
             
             conn = db.create_connection()
             db_df = pandas.read_sql_query(custom_string, conn)
 
             if platform.system() == 'Linux':
-                db_df.to_excel(os.path.expanduser("~") + '/Documentos/GERENCIAMENTO_DE_ASSISTIDOS_AELMAC/RELATORIOS_EXCEL/FILTRAGEM_POR_' + selected_filter.upper() + '_' + today + '.xlsx', index=False)
+                db_df.to_excel(os.path.expanduser('~') + '/Documentos/GERENCIAMENTO_DE_ASSISTIDOS_AELMAC/RELATORIOS_EXCEL/FILTRAGEM_POR_' + selected_filter.upper() + '_' + today + '.xlsx', index=False)
             else:
-                db_df.to_excel(os.path.expanduser("~") + '\\Documents\\GERENCIAMENTO_DE_ASSISTIDOS_AELMAC\\RELATORIOS_EXCEL\\FILTRAGEM_POR_' + selected_filter.upper() + '_' + today + '.xlsx', index=False)
+                db_df.to_excel(os.path.expanduser('~') + '\\Documents\\GERENCIAMENTO_DE_ASSISTIDOS_AELMAC\\RELATORIOS_EXCEL\\FILTRAGEM_POR_' + selected_filter.upper() + '_' + today + '.xlsx', index=False)
             
             root = tkinter.Tk()
             root.withdraw()
@@ -317,12 +317,12 @@ class AssistedController:
             
             
     def export_data(self):
-        today = datetime.datetime.now().strftime("%d-%m-%y")            
+        today = datetime.datetime.now().strftime('%d-%m-%y')            
         
         if platform.system() == 'Linux':
-            shutil.copyfile('sga_database.db', os.path.expanduser("~") + '/Documentos/GERENCIAMENTO_DE_ASSISTIDOS_AELMAC/BACKUPS/BACKUP' + '_' + today + '.db')
+            shutil.copyfile('sga_database.db', os.path.expanduser('~') + '/Documentos/GERENCIAMENTO_DE_ASSISTIDOS_AELMAC/BACKUPS/BACKUP' + '_' + today + '.db')
         else:
-            shutil.copyfile('sga_database.db', os.path.expanduser("~") + '\\Documents\\GERENCIAMENTO_DE_ASSISTIDOS_AELMAC\\BACKUPS\\BACKUP' + '_' + today + '.db')
+            shutil.copyfile('sga_database.db', os.path.expanduser('~') + '\\Documents\\GERENCIAMENTO_DE_ASSISTIDOS_AELMAC\\BACKUPS\\BACKUP' + '_' + today + '.db')
 
 
         root = tkinter.Tk()
@@ -344,7 +344,7 @@ class AssistedController:
         try:
             conn = db.create_connection()
             cursor = conn.cursor()
-            rs = cursor.execute("SELECT Nome, Usuario, Categoria FROM tb_usuarios WHERE Status = 'ON'").fetchone()
+            rs = cursor.execute('SELECT Nome, Usuario, Categoria FROM tb_usuarios WHERE Status = \'ON\'').fetchone()
             return rs
         
         except Exception as e:
@@ -360,7 +360,7 @@ class AssistedController:
         try:            
             conn = db.create_connection()
             cursor = conn.cursor()
-            cursor.execute("UPDATE tb_usuarios SET Status = 'OFF' WHERE Status = 'ON'")
+            cursor.execute('UPDATE tb_usuarios SET Status = \'OFF\' WHERE Status = \'ON\'')
             conn.commit()
             
         except Exception as e:
@@ -374,13 +374,13 @@ class AssistedController:
     
     def register_changes(self, name, message):
         try:
-            now = datetime.datetime.now().strftime("%d-%m-%y - %H:%M:%S")            
+            now = datetime.datetime.now().strftime('%d-%m-%y - %H:%M:%S')            
 
             conn = db.create_connection()
             cursor = conn.cursor()
             index = cursor.execute('SELECT COUNT(*) FROM tb_historico').fetchone()[0] + 1
                         
-            sql_string = f'''INSERT INTO tb_historico VALUES ({index}, '{now}', '{name}', '{message}')'''
+            sql_string = f'INSERT INTO tb_historico VALUES ({index}, \'{now}\', \'{name}\', \'{message}\')'
             cursor.execute(sql_string)
             conn.commit()
                         
@@ -407,12 +407,11 @@ class AssistedController:
         
         finally:
             db.close_connection(conn)
-            
-            
+                        
     def count_interviews(self, a):
         try:
             conn = db.create_connection()
-            cursor = conn.cursor()
+            cursor = conn.cursor()            
             rs = cursor.execute(f'SELECT COUNT(*) FROM tb_entrevistas WHERE id_assistido = \'{a.serial}\'').fetchone()[0]
             return rs
         
@@ -428,7 +427,6 @@ class AssistedController:
     
     def insert_interview(self, i, a):
         try:
-            # sql_string = "INSERT INTO tb_entrevistas VALUES ({}, '{}', '{}', '{}', '{}', '{}')".format(i.code, a.serial, i.date, i.interviewer, i.treatment, i.interview)
             conn = db.create_connection()
             cursor = conn.cursor()
             cursor.execute(f'INSERT INTO tb_entrevistas VALUES (\'{i.code}\', \'{a.serial}\', \'{i.date}\', \'{i.interviewer}\', \'{i.treatment}\', \'{i.interview}\')')
@@ -456,9 +454,8 @@ class AssistedController:
         try:            
             conn = db.create_connection()
             cursor = conn.cursor()
-            rs = cursor.execute(f"SELECT Data_da_entrevista, Entrevistador, Tratamento, Entrevista FROM tb_entrevistas WHERE id_assistido = '{a.serial}'").fetchall()
+            rs = cursor.execute(f'SELECT Data_da_entrevista, Entrevistador, Tratamento, Entrevista FROM tb_entrevistas WHERE id_assistido = \'{a.serial}\'').fetchall()
             
-            print(a.serial)
             return rs
         
         except Exception as e:
@@ -473,7 +470,7 @@ class AssistedController:
         
     def print_interviews(self, a):
         try:            
-            sql_string = f"SELECT Data_da_entrevista, Entrevistador, Tratamento, Entrevista FROM tb_entrevistas WHERE id_assistido = {a.serial} ORDER BY id_entrevista DESC LIMIT 3"
+            sql_string = f'SELECT Data_da_entrevista, Entrevistador, Tratamento, Entrevista FROM tb_entrevistas WHERE id_assistido = \'{a.serial}\' ORDER BY id_entrevista DESC LIMIT 3'
             
             conn = db.create_connection()
             cursor = conn.cursor()
@@ -502,9 +499,9 @@ class AssistedController:
                 j += 1
                 
             if platform.system() == 'Linux':
-                pdf.output(os.path.expanduser("~") + '/Documentos/GERENCIAMENTO_DE_ASSISTIDOS_AELMAC/FICHAS_INDIVIDUAIS/Entrevistas_de_' + a.name + '.pdf')
+                pdf.output(os.path.expanduser('~') + '/Documentos/GERENCIAMENTO_DE_ASSISTIDOS_AELMAC/FICHAS_INDIVIDUAIS/Entrevistas_de_' + a.name + '.pdf')
             else:                    
-                pdf.output(os.path.expanduser("~") + '\\Documents\\GERENCIAMENTO_DE_ASSISTIDOS_AELMAC\\FICHAS_INDIVIDUAIS\\Entrevistas_de_' + a.name + '.pdf')
+                pdf.output(os.path.expanduser('~') + '\\Documents\\GERENCIAMENTO_DE_ASSISTIDOS_AELMAC\\FICHAS_INDIVIDUAIS\\Entrevistas_de_' + a.name + '.pdf')
 
             root = tkinter.Tk()
             root.withdraw()

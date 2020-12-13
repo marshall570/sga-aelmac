@@ -57,7 +57,7 @@ class Ui_FormLogin(object):
                     self.FormFicha = QtWidgets.QMainWindow()
                     self.ui = Ui_FormFicha()
                     self.ui.setupUi(self.FormFicha)
-                    self.FormFicha.showFullScreen()
+                    self.FormFicha.show()
 
 
     def btn_create_user_clicked(self):

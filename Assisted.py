@@ -635,19 +635,15 @@ class Ui_FormFicha(object):
         
 
     def get_values(self, assisted_model):
-        import datetime
-
-        current_date = datetime.datetime.now()
-
         addictions = ''
         dreams = ''
         traits = ''
         courses = ''
         fowarding = ''
         treatments = ''
-        guidance = ''        
-
-        assisted_model.serial = str(current_date.year) + '-' + ''.join(random.choices(string.ascii_lowercase + string.digits, k=8))
+        guidance = ''
+        
+        assisted_model.serial = ''.join(random.choices(string.ascii_lowercase + string.digits, k=8))
         assisted_model.position = assisted_controller.count_assisted() + 1
         
         assisted_model.name = self.txt_name.text().strip().upper()
@@ -1060,21 +1056,11 @@ class Ui_FormFicha(object):
                     historic_message = 'ADICIONOU o registro de <{}>'.format(self.txt_name.text().strip().upper())
                     assisted_controller.insert_assisted(assisted_model)
                     assisted_controller.register_changes(self.name, historic_message)
-
-                    root = tkinter.Tk()
-                    root.withdraw()
-                    choice = messagebox.askquestion('CONTINUAR REGISTROS', 'Deseja continuar registrando assistidos?')
-                    tkinter.Tk().destroy()
-
-                    if choice == 'no':                    
-                        self.txt_index.setMaximum(assisted_controller.count_assisted())
-                        self.txt_index.setMinimum(0)
-                        self.txt_index.setValue(assisted_controller.count_assisted())
-                        self.btn_cancel_clicked()
-                    else:
-                        self.txt_name.setFocus()
-                        self.empty_form()
-                        
+                    
+                    self.txt_index.setMaximum(assisted_controller.count_assisted())
+                    self.txt_index.setMinimum(0)
+                    self.txt_index.setValue(assisted_controller.count_assisted())
+                                  
                 elif self.editing == True and self.adding == False:
                     self.save_changes()
                     self.get_values(assisted_model)
@@ -1085,7 +1071,7 @@ class Ui_FormFicha(object):
                     assisted_controller.register_changes(self.name, historic_message)
                     self.fill_form()
                 
-                    self.btn_cancel_clicked()
+                self.btn_cancel_clicked()
                                     
     def btn_delete_clicked(self):
         root = tkinter.Tk()
@@ -1287,7 +1273,7 @@ class Ui_FormFicha(object):
         FormFicha.setObjectName("FormFicha")
         FormFicha.resize(952, 743)
         self.centralwidget = QtWidgets.QWidget(FormFicha)
-        self.centralwidget.setObjectName("centralwidget")        
+        self.centralwidget.setObjectName("centralwidget")
         self.gridLayout = QtWidgets.QGridLayout(self.centralwidget)
         self.gridLayout.setObjectName("gridLayout")
         self.txt_index = QtWidgets.QSpinBox(self.centralwidget)

@@ -3,5 +3,6 @@ __pycache__/
 .vscode/
 .venv/
 uis
-old_assisted.py
+olds
+db_gen.py
 Registro_de_alteracoes.xlsx

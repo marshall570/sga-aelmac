@@ -863,7 +863,7 @@ class Ui_FormFicha(object):
         split_date = date.split('/')
         birth_year = int(split_date[2])
 
-        if self.current_year - birth_year < 15:
+        if self.current_year - birth_year < 14:
             return 'CRIANÇA'
         else:
             return 'ADULTO'

@@ -1,4 +1,4 @@
-sga_database.db
+*.db
 __pycache__/
 .vscode/
 .venv/

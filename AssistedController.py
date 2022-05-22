@@ -18,7 +18,6 @@ class AssistedController:
             conn = db.create_connection()
             cursor = conn.cursor()
             rs = cursor.execute('SELECT COUNT(*) FROM tb_assistidos').fetchone()[0]
-            # print(rs)
             return rs
 
         except Exception as e:
@@ -196,7 +195,7 @@ class AssistedController:
             pdf.add_page()
             pdf.set_font('helvetica', 'B', size=20)
             pdf.set_fill_color(200, 200, 200)
-            pdf.write(15, f'FICHA DE ASSISTIDO - {query[2]}')
+            pdf.write(15, f'FICHA DE ASSISTIDO - {query[3]}')
             pdf.ln()
 
             i = 2
@@ -213,7 +212,7 @@ class AssistedController:
                 pdf.add_page()
                 pdf.set_font('helvetica', 'B', size=20)
                 pdf.set_fill_color(200, 200, 200)
-                pdf.write(15, 'ÚLTIMA ENTREVISTA de {}'.format(query[2]))
+                pdf.write(15, 'ÚLTIMA ENTREVISTA de {}'.format(query[3]))
                 pdf.ln()
                 query_interviews = self.select_interview(a)
                 latest_interview = query_interviews[len(query_interviews) - 1]
@@ -233,10 +232,10 @@ class AssistedController:
 
             if platform.system() == 'Linux':
                 pdf.output(os.path.expanduser(
-                    '~') + '/Documentos/GERENCIAMENTO_DE_ASSISTIDOS_AELMAC/FICHAS_INDIVIDUAIS/Ficha_de_assistido-' + query[2] + '.pdf')
+                    '~') + '/Documentos/GERENCIAMENTO_DE_ASSISTIDOS_AELMAC/FICHAS_INDIVIDUAIS/Ficha_de_assistido-' + query[3] + '.pdf')
             else:
                 pdf.output(os.path.expanduser(
-                    '~') + '\\Documents\\GERENCIAMENTO_DE_ASSISTIDOS_AELMAC\\FICHAS_INDIVIDUAIS\\Ficha_de_assistido-' + query[2] + '.pdf')
+                    '~') + '\\Documents\\GERENCIAMENTO_DE_ASSISTIDOS_AELMAC\\FICHAS_INDIVIDUAIS\\Ficha_de_assistido-' + query[3] + '.pdf')
 
             root = tkinter.Tk()
             root.withdraw()
